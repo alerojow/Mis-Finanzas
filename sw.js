@@ -1,4 +1,4 @@
-const CACHE = "mf-app-v5";
+const CACHE = "mf-app-v6";
 const FONTS = "mf-fonts-v1";
 const LIBS = "mf-libs-v1"; /* lector de PDF (pdf.js) para que funcione sin internet después del primer uso */
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
