@@ -399,6 +399,7 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
 /* lectura de boletas con IA */
 .ia-box { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 12px; border-radius: 16px; background: var(--infobg); color: var(--infoink); }
 .ia-box.warn { background: var(--warnbg); color: var(--warn); }
+.ia-box.nt { grid-template-columns: 1fr; }
 .ia-th { width: 56px; height: 72px; object-fit: cover; border-radius: 10px; background: var(--soft); }
 .ia-box b { display: block; font-size: 14px; }
 .ia-box small { display: block; font-size: 13px; line-height: 1.45; margin-top: 2px; }
@@ -571,7 +572,8 @@ const ICONS = {
   cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
   paste: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
   target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-  camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/>'
+  camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/>',
+  scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 9h10M7 12h10M7 15h6"/>'
 };
 const ic = (n, cls) => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[n] || ""}</svg>`;
 
@@ -1683,27 +1685,122 @@ async function procesarFoto(file) {
     aplicarLectura(tok, d);
   } catch (e) { fotoError(tok, iaMsg(e, A)); }
 }
+/* Fecha creíble para una compra: formato válido, no futura (más de 1 día) ni de hace más de ~13 meses. */
+const fechaValida = fl => /^\d{4}-\d{2}-\d{2}$/.test(fl) && isoDay(toD(fl)) === fl && dayDiff(fl) <= 1 && dayDiff(fl) >= -400;
+/* Abre el registro ya lleno y guarda cómo se leyó (para el aviso "Leído de…"). */
+function prellenar(base, info) { openSheet(base); S.form.ia = info; renderSheet(); }
 function aplicarLectura(tok, d) {
   const total = Math.max(0, Math.round(Number(d && d.total) || 0));
   if (!d || (!d.es_comprobante && !total)) return fotoError(tok, "No encontré un comprobante en la foto. Sácala de frente, con buena luz y con la boleta completa, sobre todo la línea del TOTAL.");
-  const fl = String(d.fecha || "");
-  const fechaOk = /^\d{4}-\d{2}-\d{2}$/.test(fl) && isoDay(toD(fl)) === fl && dayDiff(fl) <= 1 && dayDiff(fl) >= -400;
+  const fl = String(d.fecha || ""), fechaOk = fechaValida(fl);
   const comercio = String(d.comercio || "").replace(/\s+/g, " ").trim().slice(0, 60);
   const base = { tipo: "Gasto", monto: total, concepto: comercio, categoria: CHIP_ORDER.Gasto.includes(d.categoria) ? d.categoria : adivinaCat(comercio) };
   if (MEDIO_IA[d.medio_pago]) base.medio = MEDIO_IA[d.medio_pago];
   if (fechaOk) base.fecha = fl;
-  openSheet(base);
-  S.form.ia = { conf: d.confianza || "media", obs: String(d.observacion || "").slice(0, 240), thumb: tok.thumb, sinFecha: !fechaOk, sinTotal: !total, verDet: false,
-    det: (Array.isArray(d.detalle) ? d.detalle : []).slice(0, 8).map(x => ({ d: String((x && x.descripcion) || "").slice(0, 60), m: Math.round(Number(x && x.monto) || 0) })).filter(x => x.d) };
-  renderSheet();
+  prellenar(base, { fuente: "ia", conf: d.confianza || "media", obs: String(d.observacion || "").slice(0, 240), thumb: tok.thumb, sinFecha: !fechaOk, sinTotal: !total, verDet: false,
+    det: (Array.isArray(d.detalle) ? d.detalle : []).slice(0, 8).map(x => ({ d: String((x && x.descripcion) || "").slice(0, 60), m: Math.round(Number(x && x.monto) || 0) })).filter(x => x.d) });
+}
+
+/* ---------- Escanear boleta (gratis): el iPhone convierte la boleta en texto ("Escanear texto") y aquí se interpreta ---------- */
+const MARCAS = [
+  [/\bhiper ?lider\b|\blider\b/, "Lider"], [/\bjumbo\b/, "Jumbo"], [/\bunimarc\b/, "Unimarc"], [/\bsanta isabel\b/, "Santa Isabel"], [/\btottus\b/, "Tottus"],
+  [/\bacuenta\b/, "aCuenta"], [/\balvi\b/, "Alvi"], [/\bmayorista ?10\b/, "Mayorista 10"], [/\bok market\b/, "OK Market"], [/\boxxo\b/, "Oxxo"],
+  [/\bcopec\b/, "Copec"], [/\bshell\b/, "Shell"], [/\baramco\b/, "Aramco"], [/\bpetrobras\b/, "Petrobras"], [/\benex\b/, "Enex"],
+  [/\bcruz verde\b/, "Cruz Verde"], [/\bsalcobrand\b/, "Salcobrand"], [/\bahumada\b/, "Farmacias Ahumada"], [/\bdr\.? ?simi\b/, "Dr. Simi"],
+  [/\bfalabella\b/, "Falabella"], [/\bripley\b/, "Ripley"], [/\bsodimac\b/, "Sodimac"], [/\bh ?& ?m\b/, "H&M"], [/\bzara\b/, "Zara"],
+  [/\bstarbucks\b/, "Starbucks"], [/\bmc ?donald/, "McDonald's"], [/\bburger king\b/, "Burger King"], [/\bkfc\b/, "KFC"], [/\bdomino'?s\b/, "Domino's"],
+  [/\btelepizza\b/, "Telepizza"], [/\bjuan maestro\b/, "Juan Maestro"], [/\bdoggis\b/, "Doggis"], [/\bcinemark\b/, "Cinemark"], [/\bcineplanet\b/, "Cineplanet"],
+  [/\bsmart ?fit\b/, "Smart Fit"], [/\bpacific fitness\b/, "Pacific Fitness"]
+];
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const titulo = s => s.toLowerCase().replace(/(^|[\s(\-/])(\S)/g, (m, a, b) => a + b.toUpperCase());
+/* Montos de una línea, sin confundirlos con RUT, fechas, horas ni porcentajes. */
+function montosEn(line) {
+  const s = line.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}\s?-\s?[\dkK]\b/g, " ").replace(/\b\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{2,4}\b/g, " ")
+    .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, " ").replace(/\d+(?:[.,]\d+)?\s?%/g, " ");
+  const out = [];
+  for (const m of s.matchAll(/(\$)?\s?(\d{1,3}(?:[.,]\d{3})+|\d+)(?:,\d{1,2}(?!\d))?/g)) {
+    const v = Number(m[2].replace(/\D/g, ""));
+    if (v >= 10 && v <= 20000000 && (m[1] || /[.,]/.test(m[2]) || m[2].length >= 3)) out.push({ v, peso: !!m[1] });
+  }
+  return out;
+}
+const soloMonto = l => !/[a-zñ]{2,}/i.test(l) && montosEn(l).length > 0;
+function parseBoleta(text) {
+  const L = String(text || "").split(/\r?\n/).map(x => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const N = L.map(norm), todo = N.join("\n");
+  const r = { total: 0, fecha: "", comercio: "", medio: "", cat: "", det: [] };
+  if (!L.length) return r;
+  /* TOTAL: la línea que dice total (no subtotal, descuentos, IVA…); si el monto quedó en otra línea, el primero que viene solo. */
+  const NO = /sub ?-?total|total\s*(de\s*)?(descuentos?|dctos?|ahorros?|iva|neto|exento|afecto|items?|art[a-z]*|productos?|unidades|uds|puntos|cuotas|lineas|bultos)\b/;
+  let best = null, iTot = -1;
+  N.forEach((n, i) => {
+    if (!/\btotal\b/.test(n) || NO.test(n)) return;
+    const pri = /total a pagar|monto total|total pagado|total compra|total venta/.test(n) ? 3 : /^total\b/.test(n) ? 2 : 1;
+    let ms = montosEn(L[i]), v = ms.length ? ms[ms.length - 1].v : 0;
+    if (!v) for (let j = i + 1; j <= Math.min(i + 3, L.length - 1); j++) if (soloMonto(L[j])) { v = montosEn(L[j])[0].v; break; }
+    if (v && (!best || pri > best.pri || (pri === best.pri && v > best.v))) { best = { pri, v }; iTot = i; }
+  });
+  if (best) r.total = best.v;
+  else {
+    const cand = [];
+    N.forEach((n, i) => { const ms = montosEn(L[i]); if (!ms.length) return;
+      if (/monto|importe|pagado|a pagar|venta|cargo/.test(n)) cand.push(ms[ms.length - 1].v);
+      else ms.filter(m => m.peso).forEach(m => cand.push(m.v)); });
+    if (cand.length) r.total = Math.max.apply(null, cand);
+  }
+  /* FECHA: primero la línea que dice "fecha"; si no trae año, el año en curso. */
+  const orden = N.map((_, i) => i).sort((a, b) => (/fecha|emision/.test(N[b]) ? 1 : 0) - (/fecha|emision/.test(N[a]) ? 1 : 0));
+  for (const i of orden) {
+    const b = buscaFecha(N[i]); if (!b) continue;
+    let y = b.y || new Date().getFullYear(), iso = y + "-" + pad(b.mo) + "-" + pad(b.d);
+    if (!b.y && !fechaValida(iso)) { y--; iso = y + "-" + pad(b.mo) + "-" + pad(b.d); }
+    if (fechaValida(iso)) { r.fecha = iso; break; }
+  }
+  /* COMERCIO: como lo has llamado antes, una marca conocida o la primera línea con nombre. */
+  const cab = N.slice(0, 12).join(" ");
+  let hist = null;
+  todosMovs().forEach(x => { const c = norm(x.concepto).trim(); if (c.length >= 4 && tipoDe(x) === "Gasto" && new RegExp("\\b" + escRe(c) + "\\b").test(cab) && (!hist || c.length > hist.l)) hist = { l: c.length, n: x.concepto.trim() }; });
+  const marca = MARCAS.find(([re]) => re.test(cab));
+  if (hist) r.comercio = hist.n;
+  else if (marca) r.comercio = marca[1];
+  else {
+    /* La primera línea con nombre: sin montos (no es un producto ni una dirección) y que no sea RUT, folio, mesa, etc. */
+    const RUIDO = /rut|r\.u\.t|boleta|factura|electr|giro|direc|casa matriz|sucursal|fono|telef|www|@|\.cl\b|comprobante|voucher|transbank|fecha|hora|caja|folio|n[°º]|\bnro\b|timbre|\bsii\b|res\.|cliente|cajer|vendedor|bienvenid|gracias|\bmesa\b|garzon|mozo|atendid|terminal|\blocal\b/;
+    const i = L.slice(0, 8).findIndex((l, k) => { const n = N[k], le = (n.match(/[a-z]/g) || []).length;
+      return le >= 3 && le >= n.replace(/\s/g, "").length * 0.6 && !RUIDO.test(n) && !montosEn(l).length; });
+    if (i >= 0) r.comercio = titulo(L[i].replace(/\b(s\.? ?a\.?|spa|ltda\.?|limitada|e\.?i\.?r\.?l\.?)\s*$/i, "").trim()).slice(0, 40);
+  }
+  r.medio = /credito|\bcred\b/.test(todo) ? CARDS[0] : /debito|redcompra|red compra/.test(todo) ? "Débito" : /transferencia/.test(todo) ? "Transferencia" : /efectivo/.test(todo) ? "Efectivo" : "";
+  r.cat = adivinaCat([r.comercio].concat(L.slice(0, 4)).join(" "));
+  /* DETALLE: productos con su precio antes de la línea del total. */
+  const NOD = /total|iva|neto|exento|rut|fecha|hora|boleta|folio|caja|vuelto|efectivo|tarjeta|credito|debito|redcompra|cajer|transbank|cuotas|autoriz/;
+  L.slice(0, iTot >= 0 ? iTot : L.length).forEach((l, i) => {
+    if (r.det.length >= 8 || NOD.test(N[i]) || (N[i].match(/[a-zñ]/g) || []).length < 3 || !/\d\s*$/.test(l)) return; /* un producto termina en su precio; una dirección no */
+    const ms = montosEn(l); if (!ms.length) return;
+    const d = l.replace(/\$?\s?-?\d{1,3}(?:[.,]\d{3})+(?:,\d{1,2})?\s*$|\$?\s?\d+\s*$/, "").replace(/\s+/g, " ").trim().slice(0, 40);
+    if (/[a-zñ]{3}/i.test(d)) r.det.push({ d, m: ms[ms.length - 1].v });
+  });
+  return r;
+}
+function scanPrev(p, hayTexto) {
+  if (!p.total && !p.fecha) return `<p style="margin:0;font-size:13.5px">${hayTexto ? "Todavía no encuentro el total. Escanea la parte de la boleta que dice <b>TOTAL</b>." : "Aquí verás lo que la app encuentra en el texto."}</p>`;
+  return `<span class="lb">Encontré</span><dl class="kv" style="margin-top:8px"><dt>Total</dt><dd>${p.total ? money(p.total) : "—"}</dd><dt>Fecha</dt><dd>${p.fecha ? dShort(p.fecha) : "—"}</dd><dt>Comercio</dt><dd>${p.comercio ? esc(p.comercio) : "—"}</dd><dt>Pago</dt><dd>${p.medio ? esc(p.medio) : "—"}</dd></dl>`;
+}
+function scanAbrir() { S.form = { foto: true, step: "texto", text: "" }; renderFoto(); showSheet(); }
+function aplicarScan(p) {
+  const base = { tipo: "Gasto", monto: p.total, concepto: p.comercio, categoria: p.cat };
+  if (p.medio) base.medio = p.medio;
+  if (p.fecha) base.fecha = p.fecha;
+  prellenar(base, { fuente: "scan", conf: "alta", obs: "", thumb: "", sinFecha: !p.fecha, sinTotal: !p.total, verDet: false, det: p.det });
 }
 function iaBox(f) {
   const x = f.ia; if (!x) return "";
-  const dud = x.conf !== "alta" || x.sinFecha || x.sinTotal || !!x.obs;
+  const dud = x.conf !== "alta" || x.sinFecha || x.sinTotal || !!x.obs, quien = x.fuente === "scan" ? "Leído con el escáner" : "Leído de la foto";
   const txt = [x.sinTotal ? "No pude leer el total: escríbelo." : "", x.sinFecha ? `No pude leer bien la fecha: quedó ${f.fecha === hoyIso() ? "la de hoy" : "el " + dShort(f.fecha)}.` : "", esc(x.obs),
     dud ? "" : "Revisa el monto, la fecha y la categoría, y toca Guardar."].filter(Boolean).join(" ");
-  return `<div class="ia-box${dud ? " warn" : ""}" role="status">${x.thumb ? `<img class="ia-th" src="${esc(x.thumb)}" alt="">` : "<span></span>"}<div>
-    <b>${dud ? "Leído de la foto: revisa los datos" : "Leído de la foto"}</b><small>${txt}</small>
+  return `<div class="ia-box${dud ? " warn" : ""}${x.thumb ? "" : " nt"}" role="status">${x.thumb ? `<img class="ia-th" src="${esc(x.thumb)}" alt="">` : ""}<div>
+    <b>${dud ? quien + ": revisa los datos" : quien}</b><small>${txt}</small>
     ${x.det.length ? `<button type="button" class="tg-det" data-act="f-iadet" aria-expanded="${x.verDet}">${x.verDet ? "Ocultar" : "Ver"} detalle de la boleta (${x.det.length})</button>${x.verDet ? `<ul class="ia-det">${x.det.map(l => `<li><span>${esc(l.d)}</span><b>${money(l.m)}</b></li>`).join("")}</ul>` : ""}` : ""}
   </div></div>`;
 }
@@ -1718,6 +1815,18 @@ function renderFoto() {
       <div class="field"><label class="lb" for="ia-key">Clave de la API</label><input class="txt" type="password" id="ia-key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…"></div>
       <button class="btn pri wide" data-act="ia-save" data-then="foto">${ic("camera")}Guardar clave y elegir la foto</button>
       <p class="note" style="margin:0">${IA_PRIV}</p></div>`;
+    return;
+  }
+  if (f.step === "texto") {
+    const puedePegar = !!(navigator.clipboard && navigator.clipboard.readText);
+    $("#sheet").innerHTML = top("Escanear boleta") + `<div class="form">
+      <ol class="steps-how" style="margin:0"><li>Toca el cuadro de abajo y vuelve a tocarlo: en el menú elige <b>Escanear texto</b>.</li>
+        <li>Apunta a la boleta con buena luz y toca <b>Insertar</b>. Si es larga, escanea la parte del <b>TOTAL</b> y la de la <b>fecha</b>: el texto se va sumando.</li></ol>
+      <div class="field"><label class="lb" for="scan-txt">Texto de la boleta</label><textarea class="txt area" id="scan-txt" rows="7" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Toca aquí y elige Escanear texto">${esc(f.text || "")}</textarea></div>
+      <div class="prev" id="scan-prev" aria-live="polite">${scanPrev(parseBoleta(f.text), !!f.text)}</div>
+      <button class="btn pri wide" data-act="scan-use">Usar estos datos</button>
+      ${puedePegar ? `<button class="btn sec wide" data-act="scan-paste">${ic("paste")}Pegar texto copiado</button>` : ""}
+      <p class="note" style="margin:0">¿No aparece <b>Escanear texto</b>? Abre la foto en Fotos, mantén presionado el texto, toca <b>Seleccionar todo</b> y <b>Copiar</b>, y pégalo aquí. Todo se lee dentro de tu iPhone: es gratis y no usa internet.</p></div>`;
     return;
   }
   if (f.step === "lista") {
@@ -1736,6 +1845,7 @@ function renderFoto() {
 }
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__mfIa = { /* solo para pruebas locales */
   aplicar: (d, thumb) => { const tok = S.form = { foto: true, step: "leyendo", thumb: thumb || "" }; renderFoto(); showSheet(); aplicarLectura(tok, d); },
+  parse: t => parseBoleta(t),
   procesar: file => procesarFoto(file)
 };
 
@@ -1776,7 +1886,7 @@ function viewAjustes() {
     <div class="seg" role="group" aria-label="Tema de la app">${[["auto", "Automático"], ["light", "Claro"], ["dark", "Oscuro"]].map(([k, l]) => `<button data-act="tema" data-v="${k}" aria-pressed="${tema === k}">${l}</button>`).join("")}</div>
     <p class="note">${tema === "auto" ? "Automático sigue el modo claro u oscuro del iPhone." : "La app queda en modo " + (tema === "dark" ? "oscuro" : "claro") + " aunque el iPhone cambie. Se guarda solo en este teléfono."}</p></section>
   <section class="card" id="ia-card"><div class="ch"><h2>${ic("camera")}Lectura de boletas con IA</h2><span class="tag ${iaK ? "good" : "warn"}">${iaK ? "Activa" : "Sin activar"}</span></div>
-    <p class="note" style="margin:0 0 12px">Al registrar un gasto toca <b>Leer una boleta con foto</b>: Claude, la IA de Anthropic, lee el comercio, la fecha, el total y cómo pagaste, y sugiere la categoría. Tú revisas antes de guardar.</p>
+    <p class="note" style="margin:0 0 12px">Al registrar un gasto toca <b>Foto con IA</b>: Claude, la IA de Anthropic, lee el comercio, la fecha, el total y cómo pagaste, y sugiere la categoría. Tú revisas antes de guardar. Sin clave puedes usar <b>Escanear boleta</b>, que usa el lector del iPhone: es gratis y no necesita internet.</p>
     ${iaK ? `<dl class="kv"><dt>Clave guardada</dt><dd>${esc(claveCorta(iaK))}</dd></dl>
       <div class="form" style="margin-top:12px"><button class="btn ghost wide" data-act="ia-del">Quitar la clave de este teléfono</button></div>`
     : `<div class="form">${IA_PASOS}
@@ -1825,7 +1935,7 @@ function viewAjustes() {
       <button class="btn sec wide" data-act="bk-restore">Restaurar desde un respaldo</button>
       <p class="note" style="margin:0">Tus datos viven solo en este iPhone, dentro de la app. Guarda un respaldo una vez al mes (por ejemplo en Archivos o iCloud Drive). Si borras el ícono de la app, el iPhone borra sus datos.</p>
     </div></section>
-  <p class="foot">Mis Finanzas v2.2 · funciona sin internet · tus datos viven solo en tu iPhone</p></div>`;
+  <p class="foot">Mis Finanzas v2.3 · funciona sin internet · tus datos viven solo en tu iPhone</p></div>`;
 }
 
 /* ===================== hoja de registro ===================== */
@@ -1876,7 +1986,7 @@ function renderSheet() {
     <form class="form" id="f" novalidate>
       ${iaBox(f)}
       <div class="seg" role="group" aria-label="Tipo">${["Gasto", "Ingreso", "Ahorro"].map(t => `<button type="button" data-act="f-tipo" data-v="${t}" aria-pressed="${f.tipo === t}">${t}</button>`).join("")}</div>
-      ${!f.id && !f.ia && f.tipo === "Gasto" ? `<button type="button" class="btn sec wide" data-act="foto-open">${ic("camera")}Leer una boleta con foto</button>` : ""}
+      ${!f.id && !f.ia && f.tipo === "Gasto" ? `<div class="two"><button type="button" class="btn sec" data-act="scan-open">${ic("scan")}Escanear boleta</button><button type="button" class="btn sec" data-act="foto-open">${ic("camera")}Foto con IA</button></div>` : ""}
       ${tpls.length ? `<div class="field"><span class="lb" id="lt">Repetir uno reciente</span><div class="chips" role="group" aria-labelledby="lt">${tpls.map(x => `<button type="button" class="chip" data-act="f-tpl" data-id="${esc(x.id)}">${esc(x.concepto || short(x.categoria))} · ${money(x.monto)}</button>`).join("")}</div></div>` : ""}
       <label class="amount"><span>$</span><input id="f-monto" inputmode="numeric" autocomplete="off" placeholder="0" value="${fmtIn(f.monto)}" aria-label="Monto total"></label>
       <div class="share-hint" id="share-hint">${shareHint(f)}</div>
@@ -2197,6 +2307,16 @@ document.addEventListener("click", e => {
     case "imp-run": importar(); break;
     case "pdf-open": { const i = document.getElementById("pdf-in"); if (i) i.click(); break; }
     case "foto-open": fotoAbrir(); break;
+    case "scan-open": scanAbrir(); break;
+    case "scan-paste": navigator.clipboard.readText().then(t => {
+        if (!t) return toast("No hay texto copiado.");
+        const ta = $("#scan-txt"); if (!ta) return;
+        ta.value = (ta.value ? ta.value + "\n" : "") + t; ta.dispatchEvent(new Event("input", { bubbles: true }));
+      }).catch(() => toast("No pude leer lo copiado: mantén presionado el cuadro y elige Pegar."));
+      break;
+    case "scan-use": { const ta = $("#scan-txt"), p = parseBoleta(ta ? ta.value : (f && f.text) || "");
+      if (!p.total && !p.fecha) { toast("No reconocí una boleta: escanea la parte que dice TOTAL."); break; }
+      aplicarScan(p); break; }
     case "foto-manual": openSheet(); break;
     case "f-iadet": if (f && f.ia) { f.ia.verDet = !f.ia.verDet; renderSheet(); } break;
     case "ia-save": { const i = $("#ia-key"), k = i ? i.value.replace(/\s+/g, "") : "";
@@ -2249,6 +2369,7 @@ document.addEventListener("input", e => {
   const t = e.target;
   if (t.id === "q") { S.q = t.value; const l = $("#mlist"); if (l) l.innerHTML = movList(); return; }
   if (t.id === "imp-txt" && S.form && S.form.imp) { S.form.text = t.value; return; }
+  if (t.id === "scan-txt" && S.form && S.form.foto) { S.form.text = t.value; const p = $("#scan-prev"); if (p) p.innerHTML = scanPrev(parseBoleta(t.value), !!t.value.trim()); return; }
   if (t.id === "tc-corte" || t.id === "tc-pago") { t.value = String(digits(t.value) || "").slice(0, 2); return; }
   if (t.id === "f-monto" || t.hasAttribute("data-money")) {
     const n = digits(t.value); t.value = fmtIn(n);
