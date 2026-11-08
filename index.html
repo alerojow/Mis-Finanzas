@@ -70,12 +70,14 @@ input, select, textarea { font: inherit; color: inherit; }
 .top { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px 10px 18px; }
 .top .tt { min-width: 0; }
 .top small { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.top h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top h1 { margin: 0; font-size: clamp(19px, 5.6vw, 24px); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top .tr { display: flex; gap: 8px; align-items: center; flex: none; }
 .ms { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
 .ms button, .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; color: var(--ink); }
 .ib { background: var(--card); border: 1px solid var(--line); }
 .ms button:active, .ib:active { background: var(--soft); }
+.ib.lbl { width: 58px; align-content: center; justify-items: center; gap: 2px; font-size: 10.5px; font-weight: 600; line-height: 1; color: var(--pri); }
+.ib.lbl .ic { width: 18px; height: 18px; }
 .wrap { padding: 2px 16px 8px; display: grid; gap: 14px; }
 .month { display: grid; gap: 6px; padding: 0 2px; }
 .month .row { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); font-weight: 500; }
@@ -759,7 +761,7 @@ async function boot() {
 /* ===================== piezas de vista ===================== */
 const mesTit = () => cap(mesNom(S.mes)) + " " + S.mes.slice(0, 4);
 function topBar(small, title, gear) {
-  return `<header class="top"><div class="tt"><small>${small}</small><h1>${title}</h1></div><div class="tr">${gear ? `<button class="ib" data-act="tab" data-tab="ajustes" aria-label="Ajustes">${ic("sliders")}</button>` : ""}<div class="ms"><button data-act="mes-prev" aria-label="Mes anterior">${ic("chevL")}</button><button data-act="mes-next" aria-label="Mes siguiente">${ic("chevR")}</button></div></div></header>`;
+  return `<header class="top"><div class="tt"><small>${small}</small><h1>${title}</h1></div><div class="tr">${gear ? `<button class="ib lbl" data-act="tab" data-tab="ajustes">${ic("sliders")}<span>Ajustes</span></button>` : ""}<div class="ms"><button data-act="mes-prev" aria-label="Mes anterior">${ic("chevL")}</button><button data-act="mes-next" aria-label="Mes siguiente">${ic("chevR")}</button></div></div></header>`;
 }
 const infoBtn = k => `<button class="info" data-act="tg" data-k="${k}" aria-expanded="${!!S.open[k]}" aria-label="¿Qué significa?">${ic("info")}</button>`;
 const explain = (k, h) => (S.open[k] ? `<div class="exp" role="note">${h}</div>` : "");
