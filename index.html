@@ -415,6 +415,10 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
 .sel { border: 1.5px solid var(--ctl); border-radius: 10px; min-height: 40px; padding: 0 10px; background: var(--card); font-size: 16px; color: var(--ink); width: 100%; }
 .chk[aria-checked="true"]::before { background: var(--good); border-color: var(--good); }
 .chk[aria-checked="true"] .ic { color: var(--on-good); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kv dd.bad { color: var(--bad); }
 .chk-row { display: flex; align-items: center; gap: 4px; width: 100%; text-align: left; font-size: 14px; border-radius: 12px; background: var(--soft); padding-right: 12px; }
 .chk-row[aria-checked="true"] .chk::before { background: var(--good); border-color: var(--good); }
 .chk-row[aria-checked="true"] .chk .ic { color: var(--on-good); }
@@ -429,13 +433,14 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
   <button class="tab" data-act="tab" data-tab="resumen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Inicio</button>
   <button class="tab" data-act="tab" data-tab="movimientos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Movimientos</button>
   <button class="plus" data-act="fab" aria-label="Registrar movimiento"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-  <button class="tab" data-act="tab" data-tab="tarjeta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg>Tarjeta</button>
+  <button class="tab" data-act="tab" data-tab="tarjeta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg>Bancos</button>
   <button class="tab" data-act="tab" data-tab="aprende"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>Aprende</button>
 </div></nav>
 <div class="scrim" id="scrim" data-act="sheet-close"></div>
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title"></section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <input type="file" id="restore-in" accept=".json,application/json" hidden>
+<input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 
 <script>
 (function () {
@@ -461,7 +466,8 @@ const CHIP_ORDER = {
   Ahorro: ["Ahorro e inversión"]
 };
 const TOP_N = 6;
-const MEDIOS = ["TC Scotiabank", "Débito", "Transferencia", "Efectivo", "Cargo automático (PAC/PAT)", "Otra tarjeta"];
+const MEDIOS = ["TC Scotiabank", "Débito", "Cuenta B.Chile", "Transferencia", "Efectivo", "Cargo automático (PAC/PAT)", "Otra tarjeta"];
+const CTA_BCHILE = "Cuenta B.Chile";
 const CARDS = ["TC Scotiabank"];
 const DEF = { metaAhorro: 200000, metas: {}, presupuesto: {} };
 const CLSVAR = { Fijo: "--fijo", Variable: "--var", Deuda: "--deu", Ahorro: "--aho", Ingreso: "--good" };
@@ -1073,14 +1079,14 @@ function movRow(x) {
 const tcDraft = {};
 function viewTarjeta() {
   const r = resumen(S.mes), c = ciclo(S.mes);
-  return topBar("Pagas en " + mesNom(S.mes) + " " + S.mes.slice(0, 4), CARDS.length === 1 ? CARDS[0] : "Tarjetas") + `<div class="wrap">` + CARDS.map(card => {
+  return topBar(mesTit(), "Bancos") + `<div class="wrap">` + CARDS.map(card => {
     const rows = r.rows.filter(x => x.medio === card);
     const t = r.porTc.find(x => x.tarjeta === card) || { tarjeta: card, facturado: "", estado: "Pendiente", det: rows.reduce((a, x) => a + (Number(x.monto) || 0), 0), sin: 0, n: rows.length };
     const f = Number(t.facturado) || 0, pd = f ? t.det / f : 0, id = slug(card), est = tcDraft[card] || t.estado || "Pendiente";
     const m = {}; rows.forEach(x => { m[x.categoria] = (m[x.categoria] || 0) + (Number(x.monto) || 0); });
     const cc = Object.entries(m).sort((a, b) => b[1] - a[1]);
-    const stmt = `<section class="card"><div class="ch"><h2>Estado de cuenta de ${mesNom(S.mes)}</h2><span class="tag ${est === "Pagado" ? "good" : "warn"}">${est}</span></div>
-      <p class="sub">${(() => { const pr = periodo(addM(S.mes, -1), card); return pr.corte ? "Compras del " + dShort(pr.ini) + " al " + dShort(pr.fin) : "Compras de " + mesNom(addM(S.mes, -1)); })()}${(t.vence || venceTc(S.mes, card)) ? " · vence el " + dShort(t.vence || venceTc(S.mes, card)) : ""}</p>
+    const stmt = `<section class="card"><div class="ch"><h2>${ic("card")}${esc(card)}</h2><span class="tag ${est === "Pagado" ? "good" : "warn"}">${est}</span></div>
+      <p class="sub">Estado de cuenta que pagas en ${mesNom(S.mes)} · ${(() => { const pr = periodo(addM(S.mes, -1), card); return pr.corte ? "compras del " + dShort(pr.ini) + " al " + dShort(pr.fin) : "compras de " + mesNom(addM(S.mes, -1)); })()}${(t.vence || venceTc(S.mes, card)) ? " · vence el " + dShort(t.vence || venceTc(S.mes, card)) : ""}</p>
       <div class="form">
         <div class="field"><label class="lb" for="tc-${id}">Total facturado</label><div class="money"><span>$</span><input id="tc-${id}" inputmode="numeric" autocomplete="off" value="${fmtIn(f)}" placeholder="0" data-money></div></div>
         <div class="two"><div class="field"><label class="lb" for="tcv-${id}">Vence (opcional)</label><input class="txt" type="date" id="tcv-${id}" value="${esc(t.vence || venceTc(S.mes, card))}"></div>
@@ -1095,15 +1101,36 @@ function viewTarjeta() {
         <li class="${f && t.sin === 0 ? "ok" : "todo"}"><span>${f && t.sin === 0 ? ic("check") : "3"}</span><div><b>${t.sin > 0 ? "Faltan " + money(t.sin) + " por detallar" : t.sin < 0 ? "Registraste " + money(-t.sin) + " de más" : f ? "Todo detallado" : "Revisa lo que falta"}</b><small>${t.sin > 0 ? "Mientras tanto cuentan como gasto variable, para que tu total cuadre con lo que pagas." : t.sin < 0 ? "Revisa el mes de pago de algunas compras: quizás corresponden al próximo estado de cuenta." : f ? "Tu gasto por categoría es exacto." : "Cuando anotes el total verás cuánto falta por detallar."}</small></div></li>
       </ol></section>`;
     const imp = `<section class="card"><div class="ch"><h2>${ic("paste")}Detallar desde el banco</h2></div>
-      <p class="p">Copia la lista de compras de tu estado de cuenta (web, app, PDF o Excel del banco) y pégala. La app reconoce fecha, comercio y monto, sugiere la categoría y evita duplicados.</p>
-      <button class="btn pri wide" data-act="imp-open" data-card="${esc(card)}" style="margin-top:12px">Pegar movimientos del banco</button></section>`;
+      <p class="p">Sube el PDF del estado de cuenta o de la cartola. La app reconoce si es de Scotiabank o del Banco de Chile, lee cada movimiento, sugiere la categoría, evita duplicados y comprueba que cuadre con el total.</p>
+      <div class="form" style="margin-top:12px"><button class="btn pri wide" data-act="pdf-open">${ic("paste")}Subir PDF del banco</button>
+      <button class="btn sec wide" data-act="imp-open" data-card="${esc(card)}">Pegar texto copiado</button></div>
+      <p class="note">El PDF se lee dentro de tu iPhone y no se sube a ningún lado. Si tiene clave, la app te la pide.</p></section>`;
     const curso = `<section class="card"><div class="ch"><h2>Compras en curso</h2><span class="tag warn">se pagan en ${mesNom(c.pago)}</span></div>
       ${c.per.corte ? `<p class="sub">Ciclo del ${dShort(c.per.ini)} al ${dShort(c.per.fin)}</p>` : ""}
       ${c.n ? `<ul class="cats">${c.compras.slice().reverse().map(x => `<li><div class="crow"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span><div class="cm"><div class="ct"><b>${esc(x.concepto || x.categoria)}</b><span>${money(x.monto)}</span></div><small>${dLong(x.fecha)} · ${esc(x.categoria)}</small></div></div></li>`).join("")}</ul>
       <p class="note">Total ${money(c.gastado)} en ${c.n} ${c.n === 1 ? "compra" : "compras"}.${c.restantes > 0 && c.presVar ? ` Puedes gastar ${money(c.diaria)} al día sin pasarte.` : ""}</p>`
       : `<p class="p">Aún no registras compras con tarjeta en ${mesNom(S.mes)}. Una compra hecha hoy aparece en el estado de cuenta del mes siguiente: la app la asigna sola a ${mesNom(c.pago)}.</p>`}</section>`;
     return stmt + imp + curso;
-  }).join("") + `</div>`;
+  }).join("") + bchileCard() + `</div>`;
+}
+/* Banco de Chile: cuenta corriente y línea de crédito, desde la última cartola guardada. */
+function bchileCard() {
+  const cs = Object.values((STORE && STORE.cartolas) || {}).filter(c => c.banco === "B.Chile" && c.hasta).sort((a, b) => b.hasta.localeCompare(a.hasta));
+  const c = cs.find(x => x.hasta.slice(0, 7) <= S.mes) || cs[cs.length - 1];
+  const movsMes = S.movs.filter(x => x.mesPago === S.mes && x.medio === CTA_BCHILE);
+  const gMes = movsMes.filter(x => tipoDe(x) === "Gasto").reduce((a, x) => a + mi(x), 0);
+  const head = `<div class="ch"><h2>${ic("bank")}Banco de Chile</h2><span class="tag">${CTA_BCHILE.replace("Cuenta ", "cuenta ")}</span></div>`;
+  if (!c) return `<section class="card">${head}<p class="p">Sube la cartola de tu cuenta corriente (PDF) y la app separa los cargos, los intereses y el uso de la línea de crédito.</p>
+    <button class="btn sec wide" data-act="pdf-open" style="margin-top:12px">Subir cartola del Banco de Chile</button></section>`;
+  const uso = c.aprobado ? (c.utilizado || 0) / c.aprobado : 0;
+  return `<section class="card">${head}
+    <p class="sub">Última cartola: del ${dShort(c.desde)} al ${dShort(c.hasta)}</p>
+    ${c.aprobado ? `<div class="field"><span class="lb">Línea de crédito</span><div class="cb" role="img" aria-label="Usas ${pct(uso, 0)} de la línea"><i style="width:${Math.min(100, uso * 100)}%;background:var(${uso >= 0.9 ? "--bad" : "--var"})"></i></div>
+      <small class="note" style="margin:0">Usas ${money(c.utilizado || 0)} de ${money(c.aprobado)} (${pct(uso, 0)}) · disponible ${money(c.disponible || 0)}</small></div>` : ""}
+    <dl class="kv" style="margin-top:12px"><dt>Cargos del período</dt><dd>${money(c.cargos || 0)}</dd><dt>Abonos del período</dt><dd>${money(c.abonos || 0)}</dd>${c.saldoFinal != null ? `<dt>Saldo final</dt><dd>${money(c.saldoFinal)}</dd>` : ""}${c.intereses ? `<dt>Intereses e impuestos</dt><dd class="bad">${money(c.intereses)}</dd>` : ""}
+      <dt>Gastos con esta cuenta en ${mesNom(S.mes)}</dt><dd>${money(gMes)}</dd></dl>
+    ${c.intereses && uso >= 0.9 ? `<p class="msg warn">${ic("alert")}<span>La línea está al tope: pagas cerca de <b>${money(c.intereses)}</b> al mes solo en intereses e impuestos. Bajarla es un ahorro seguro: cada $100.000 que abonas reduce ese costo.</span></p>` : ""}
+    <button class="btn sec wide" data-act="pdf-open" style="margin-top:12px">Subir otra cartola</button></section>`;
 }
 
 /* ===================== importar desde el banco ===================== */
@@ -1150,6 +1177,7 @@ function parseBanco(txt, mesPago) {
     const line = raw.replace(/\t/g, "  ").replace(/\s+/g, " ").trim(); if (!line) return;
     const nl = norm(line);
     if (/total (facturado|a pagar)|monto (total )?facturado/.test(nl)) { const a = (line.match(reAmt) || []).map(val).filter(v => v > 0); if (a.length) total = a[a.length - 1]; return; }
+    if (/pagar hasta|fecha (de )?vencimiento|monto minimo|\bcupo\b|periodo (facturado|anterior)|fecha (de )?estado|\btasa\b|\bcae\b|costo (monetario|total)|\blimite\b|proximo periodo|saldo anterior|total (de )?(operaciones|compras|pagos|cargos)/.test(nl)) return;
     const fd = buscaFecha(nl); if (!fd) return;
     let y = fd.y; if (!y) { y = Py; if (y + "-" + pad(fd.mo) + "-" + pad(fd.d) > finPago) y--; }
     const iso = y + "-" + pad(fd.mo) + "-" + pad(fd.d);
@@ -1168,7 +1196,158 @@ function parseBanco(txt, mesPago) {
   return { rows, total };
 }
 function showSheet() { const sh = $("#sheet"); sh.scrollTop = 0; $("#scrim").classList.add("on"); sh.classList.add("on"); }
+
+/* ===================== PDF del banco (se lee dentro del teléfono con pdf.js) ===================== */
+const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfjsP = null;
+function cargarPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (!pdfjsP) pdfjsP = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = PDFJS + "pdf.min.js";
+    s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.js"; res(window.pdfjsLib); };
+    s.onerror = () => { pdfjsP = null; rej(new Error("sin-lector")); };
+    document.head.appendChild(s);
+  });
+  return pdfjsP;
+}
+/* Devuelve las líneas del PDF: fragmentos agrupados por altura (y) y ordenados por posición (x). */
+async function pdfLineas(bytes, password) {
+  const lib = await cargarPdfJs();
+  const pdf = await lib.getDocument({ data: bytes, password: password || undefined, isEvalSupported: false }).promise;
+  const out = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const tc = await (await pdf.getPage(p)).getTextContent();
+    const items = tc.items.filter(i => i.str && i.str.trim()).map(i => ({ s: i.str.trim(), x: i.transform[4], y: i.transform[5], w: i.width || 0 }));
+    items.sort((a, b) => b.y - a.y || a.x - b.x);
+    const rows = [];
+    for (const it of items) { const r = rows.find(r => Math.abs(r.y - it.y) <= 2.5); if (r) r.items.push(it); else rows.push({ y: it.y, items: [it] }); }
+    rows.sort((a, b) => b.y - a.y);
+    rows.forEach(r => { r.items.sort((a, b) => a.x - b.x); r.p = p; r.text = r.items.map(i => i.s).join("   "); });
+    out.push(...rows);
+  }
+  return out;
+}
+const tituloDesc = s => (String(s || "").toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()).replace(/\s+/g, " ").trim().slice(0, 40)) || "Movimiento";
+const montoTxt = s => { const n = Number(String(s).replace(/[^\d-]/g, "")); return isFinite(n) ? n : 0; };
+const esMonto = s => /^-?\$?\s?\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$/.test(String(s).trim());
+function detectaBanco(rows) {
+  const t = norm(rows.slice(0, 80).map(r => r.text).join(" ") + " " + rows.slice(-40).map(r => r.text).join(" "));
+  if (/bancochile|banco de chile|bancoedwards|banco edwards/.test(t)) return "bchile";
+  if (/scotiabank|scotia/.test(t)) return "scotia";
+  return "";
+}
+const esCartola = rows => rows.some(r => /monto cheques|monto depositos|cartola/.test(norm(r.text)));
+/* Cartola de cuenta corriente Banco de Chile: período, línea de crédito, cargos y abonos por columna. */
+function parseCartola(rows) {
+  let desde = "", hasta = "";
+  const rDH = rows.find(r => /\bdesde\b/.test(norm(r.text)) && /\bhasta\b/.test(norm(r.text)));
+  if (rDH) { const m = [...rDH.text.matchAll(/(\d{2})\/(\d{2})\/(\d{4})/g)]; if (m.length >= 2) { desde = m[0][3] + "-" + m[0][2] + "-" + m[0][1]; hasta = m[1][3] + "-" + m[1][2] + "-" + m[1][1]; } }
+  const valDe = re => { const r = rows.find(r => re.test(norm(r.text))); if (!r) return null; const n = r.items.filter(i => esMonto(i.s)); return n.length ? montoTxt(n[n.length - 1].s) : null; };
+  const linea = { aprobado: valDe(/\baprobado\b/), utilizado: valDe(/\butilizado\b/), disponible: valDe(/^\s*disponible\b|\bdisponible\s*:/) };
+  const hi = rows.findIndex(r => /monto cheques|monto depositos/.test(norm(r.text)));
+  if (hi < 0) return null;
+  const H = rows[hi].items, xOf = re => { const it = H.find(i => re.test(norm(i.s))); return it ? it.x : null; };
+  const xCargo = xOf(/monto cheques/), xAbono = xOf(/monto depositos/), xSaldo = xOf(/^saldo$/), xSuc = xOf(/^sucursal$/) || 9999;
+  const movs = []; let saldoFinal = null, saldoInicial = null;
+  for (let k = hi + 1; k < rows.length; k++) {
+    const r = rows[k], first = r.items[0];
+    if (!first || !/^\d{2}\/\d{2}$/.test(first.s)) continue;
+    const nt = norm(r.text);
+    const amt = r.items.filter(i => i !== first && esMonto(i.s) && i.x + i.w / 2 >= (xCargo == null ? 0 : xCargo - 10));
+    if (/saldo inicial/.test(nt)) { if (amt.length) saldoInicial = montoTxt(amt[amt.length - 1].s); continue; }
+    if (/saldo final/.test(nt)) { if (amt.length) saldoFinal = montoTxt(amt[amt.length - 1].s); continue; }
+    let cargo = 0, abono = 0;
+    amt.forEach(i => { const c = i.x + i.w / 2; if (xSaldo != null && c >= xSaldo - 10) return; if (xAbono != null && c >= xAbono - 5) abono += Math.abs(montoTxt(i.s)); else cargo += Math.abs(montoTxt(i.s)); });
+    if (!cargo && !abono) continue;
+    const [dd, mm] = first.s.split("/");
+    let y = Number((hasta || hoyIso()).slice(0, 4)); if (hasta && y + "-" + mm + "-" + dd > hasta) y--;
+    const desc = r.items.filter(i => i !== first && i.x < xSuc - 15 && !amt.includes(i)).map(i => i.s).join(" ").replace(/\s+of\.\s.*$/i, "");
+    movs.push({ iso: y + "-" + mm + "-" + dd, desc: tituloDesc(desc), cargo, abono });
+  }
+  return { banco: "bchile", desde, hasta, linea, saldoInicial, saldoFinal, movs };
+}
+/* Estado de cuenta de tarjeta: vencimiento, total facturado y compras (usa el mismo lector que "Pegar texto"). */
+function parseTcPdf(rows) {
+  let vence = "";
+  const rv = rows.find(r => /pagar hasta|fecha (de )?vencimiento|vencimiento|ultimo dia de pago/.test(norm(r.text)) && /\d{2}\/\d{2}\/\d{2,4}/.test(r.text));
+  if (rv) { const m = rv.text.match(/(\d{2})\/(\d{2})\/(\d{2,4})/); let y = Number(m[3]); if (y < 100) y += 2000; vence = y + "-" + m[2] + "-" + m[1]; }
+  const mesPago = vence ? vence.slice(0, 7) : S.mes;
+  const p = parseBanco(rows.map(r => r.text).join("\n"), mesPago);
+  return Object.assign(p, { vence, mesPago });
+}
+function dupNoTarjeta(iso, monto) { return todosMovs().some(x => !isCard(x.medio) && Math.round(Number(x.monto)) === monto && x.fecha && Math.abs(daysBetween(x.fecha, iso)) <= 3); }
+async function procesarPdf(bytes, password) {
+  S.form = { imp: true, step: "loading", bytes };
+  renderImport(); showSheet();
+  let rows;
+  try { rows = await pdfLineas(new Uint8Array(bytes), password); }
+  catch (e) {
+    if (e && e.name === "PasswordException") { S.form = { imp: true, step: "password", bytes, mala: e.code === 2 }; renderImport(); setTimeout(() => { const i = $("#pdf-pass"); if (i) i.focus(); }, 300); return; }
+    S.form = { imp: true, step: "error", msg: e && e.message === "sin-lector" ? "Para leer el PDF por primera vez la app necesita internet. Conéctate e intenta de nuevo." : "No pude leer este PDF. Si es una imagen escaneada no tiene texto; prueba con el PDF que descargas del sitio del banco." };
+    renderImport(); return;
+  }
+  const banco = detectaBanco(rows);
+  if (!rows.length) { S.form = { imp: true, step: "error", msg: "El PDF no trae texto que la app pueda leer (parece una imagen)." }; renderImport(); return; }
+  if (esCartola(rows)) {
+    const c = parseCartola(rows);
+    if (!c) { S.form = { imp: true, step: "error", msg: "Reconocí una cartola, pero no encontré la tabla de movimientos." }; renderImport(); return; }
+    const filas = c.movs.map(m => {
+      if (m.cargo) { const banc = /interes|impuesto|comision|mantencion|seguro|cargo|cobro/.test(norm(m.desc)); const cat = banc ? "Bancos y créditos" : adivinaCat(m.desc); const dup = dupNoTarjeta(m.iso, m.cargo); return { iso: m.iso, desc: m.desc, monto: m.cargo, tipo: "cargo", cat, on: !!cat && !dup, dup }; }
+      return { iso: m.iso, desc: m.desc, monto: m.abono, tipo: "abono", cat: "", on: false, abono: true, linea: /linea de credi/.test(norm(m.desc)), dup: false };
+    });
+    S.form = { imp: true, step: "review", doc: "cartola", banco: c.banco, rows: filas, cartola: c, card: CTA_BCHILE };
+  } else {
+    if (banco === "bchile") { S.form = { imp: true, step: "error", msg: "Este PDF parece ser de una tarjeta del Banco de Chile. Por ahora la app maneja la TC Scotiabank y la cuenta corriente del Banco de Chile." }; renderImport(); return; }
+    const p = parseTcPdf(rows);
+    if (!p.rows.length && !p.total) { S.form = { imp: true, step: "error", msg: "No reconocí compras en este PDF. Prueba con \"Pegar texto\" o mándale el PDF a Claude para ajustar el lector." }; renderImport(); return; }
+    const card = CARDS[0], cur = S.tcs.find(x => x.mesPago === p.mesPago && x.tarjeta === card);
+    S.form = { imp: true, step: "review", doc: "tc", banco: banco || "scotia", card, rows: p.rows, total: p.total, vence: p.vence, mesPago: p.mesPago, useTotal: !!p.total && !(cur && Number(cur.facturado)), fuente: "pdf" };
+  }
+  renderImport(); $("#sheet").scrollTop = 0;
+}
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__mfPdf = (buf, pass) => procesarPdf(buf, pass); /* solo para pruebas locales */
 function renderImport() {
+  const f = S.form; if (!f || !f.imp) return;
+  const top = t => `<div class="grab" aria-hidden="true"></div><div class="sh-top"><h3 id="sh-title">${t}</h3><button class="x" data-act="sheet-close" aria-label="Cerrar">${ic("x")}</button></div>`;
+  if (f.step === "loading") { $("#sheet").innerHTML = top("Leyendo el PDF…") + `<div class="form" aria-busy="true"><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div><div class="skel" style="width:60%"></div><p class="note" style="margin:0">El PDF se lee aquí mismo, en tu iPhone: no se sube a ningún lado.</p></div>`; return; }
+  if (f.step === "password") {
+    $("#sheet").innerHTML = top("Este PDF tiene clave") + `<div class="form">
+      ${f.mala ? `<p class="msg bad" style="margin:0">${ic("alert")}<span>La clave no es correcta. Intenta de nuevo.</span></p>` : ""}
+      <p class="p">Escribe la clave del PDF para abrirlo. Muchos bancos usan tu RUT sin puntos ni guion, o sus primeros dígitos. La clave no se guarda.</p>
+      <div class="field"><label class="lb" for="pdf-pass">Clave del PDF</label><input class="txt" type="password" id="pdf-pass" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      <button class="btn pri wide" data-act="pdf-pass">Abrir PDF</button></div>`;
+    return;
+  }
+  if (f.step === "error") { $("#sheet").innerHTML = top("No se pudo leer") + `<div class="form"><p class="msg warn" style="margin:0">${ic("alert")}<span>${esc(f.msg)}</span></p><button class="btn sec wide" data-act="sheet-close">Cerrar</button></div>`; return; }
+  if (f.doc === "cartola" && f.step === "review") return renderCartola(top);
+  return renderImportTc();
+}
+function renderCartola(top) {
+  const f = S.form, c = f.cartola, L = c.linea || {};
+  const cargos = f.rows.filter(r => r.tipo === "cargo"), abonos = f.rows.filter(r => r.tipo === "abono");
+  const sumC = cargos.reduce((a, r) => a + r.monto, 0), sumA = abonos.reduce((a, r) => a + r.monto, 0);
+  const sel = f.rows.filter(r => r.on && r.cat), tot = sel.reduce((a, r) => a + r.monto, 0);
+  const usoL = L.aprobado ? (L.utilizado || 0) / L.aprobado : 0;
+  const intereses = cargos.filter(r => /interes|impuesto/.test(norm(r.desc))).reduce((a, r) => a + r.monto, 0);
+  const cuadra = c.saldoInicial != null && c.saldoFinal != null ? c.saldoInicial + sumA - sumC : null;
+  const opts = r => (r.tipo === "abono" ? CHIP_ORDER.Ingreso : CHIP_ORDER.Gasto).map(n => `<option value="${esc(n)}" ${r.cat === n ? "selected" : ""}>${esc(n)}</option>`).join("");
+  $("#sheet").innerHTML = top("Cartola Banco de Chile") + `<div class="form">
+    <p class="p">Cuenta corriente · del <b>${c.desde ? dShort(c.desde) : "?"}</b> al <b>${c.hasta ? dShort(c.hasta) : "?"}</b></p>
+    ${L.aprobado ? `<div class="field"><span class="lb">Línea de crédito</span><div class="cb" role="img" aria-label="Usas ${pct(usoL, 0)} de la línea"><i style="width:${Math.min(100, usoL * 100)}%;background:var(${usoL >= 0.9 ? "--bad" : "--var"})"></i></div>
+      <small class="note" style="margin:0">Usas ${money(L.utilizado || 0)} de ${money(L.aprobado)} (${pct(usoL, 0)}) · disponible ${money(L.disponible || 0)}</small></div>` : ""}
+    <dl class="kv"><dt>Cargos</dt><dd>${money(sumC)}</dd><dt>Abonos</dt><dd>${money(sumA)}</dd>${c.saldoFinal != null ? `<dt>Saldo final</dt><dd>${money(c.saldoFinal)}</dd>` : ""}${intereses ? `<dt>Intereses e impuestos</dt><dd class="bad">${money(intereses)}</dd>` : ""}</dl>
+    ${cuadra != null ? (Math.abs(cuadra - c.saldoFinal) <= 1 ? `<p class="msg good" style="margin:0">${ic("check")}<span>Cuadra: saldo inicial ${money(c.saldoInicial)} + abonos ${money(sumA)} − cargos ${money(sumC)} = saldo final ${money(c.saldoFinal)}.</span></p>`
+      : `<p class="msg warn" style="margin:0">${ic("alert")}<span>No cuadra por ${money(cuadra - c.saldoFinal)}: puede que alguna línea no se haya leído bien. Revisa la lista.</span></p>`) : ""}
+    ${intereses && usoL >= 0.9 ? `<p class="msg warn" style="margin:0">${ic("alert")}<span>Tu línea de crédito está al tope y este período te costó <b>${money(intereses)}</b> en intereses e impuestos. Bajarla es un ahorro seguro.</span></p>` : ""}
+    <ul class="imp">${f.rows.map((r, i) => `<li class="${r.on ? "" : "off"}"><button type="button" class="chk" role="checkbox" aria-checked="${r.on}" data-act="imp-toggle" data-i="${i}" aria-label="Importar ${esc(r.desc)}">${ic("check")}</button>
+      <div class="pm"><b>${esc(r.desc)}</b><small>${dShort(r.iso)} · ${r.tipo === "cargo" ? "cargo" : r.linea ? "abono: uso de la línea de crédito, no es ingreso" : "abono"}${r.dup ? " · ya registrado" : ""}</small></div><span class="pa">${r.tipo === "abono" ? "+" : "−"}${money(r.monto)}</span>
+      <select class="sel" data-i="${i}" aria-label="Categoría de ${esc(r.desc)}"><option value="">Elegir categoría…</option>${opts(r)}</select></li>`).join("")}</ul>
+    <p class="note" style="margin:0">Los cargos se anotan como gastos pagados con la cuenta del Banco de Chile, en el mes de cada movimiento. Los abonos quedan sin marcar: actívalos solo si son ingresos reales.</p>
+    <div class="sh-actions"><button type="button" class="btn pri wide" data-act="imp-run">${sel.length ? `Importar ${sel.length} y guardar el resumen` : "Guardar el resumen de la cartola"}</button>
+    <button type="button" class="btn sec wide" data-act="sheet-close">Cancelar</button></div></div>`;
+}
+function renderImportTc() {
   const f = S.form; if (!f || !f.imp) return;
   const top = `<div class="grab" aria-hidden="true"></div><div class="sh-top"><h3 id="sh-title">${f.step === "paste" ? "Pegar movimientos del banco" : "Revisa antes de importar"}</h3><button class="x" data-act="sheet-close" aria-label="Cerrar">${ic("x")}</button></div>`;
   if (f.step === "paste") {
@@ -1180,10 +1359,15 @@ function renderImport() {
     return;
   }
   const sel = f.rows.filter(r => r.on && r.cat), tot = sel.reduce((a, r) => a + r.monto, 0);
-  const t = S.tcs.find(x => x.mesPago === S.mes && x.tarjeta === f.card), fact = Number(t && t.facturado) || (f.useTotal ? f.total : 0);
-  const det = S.movs.filter(x => x.mesPago === S.mes && x.medio === f.card).reduce((a, x) => a + (Number(x.monto) || 0), 0);
+  const mp = f.mesPago || S.mes;
+  const t = S.tcs.find(x => x.mesPago === mp && x.tarjeta === f.card), fact = Number(t && t.facturado) || (f.useTotal ? f.total : 0);
+  const det = S.movs.filter(x => x.mesPago === mp && x.medio === f.card).reduce((a, x) => a + (Number(x.monto) || 0), 0);
   const sinCat = f.rows.filter(r => r.on && !r.cat).length;
+  const sumPdf = f.rows.filter(r => !r.abono).reduce((a, r) => a + r.monto, 0), dif = f.total ? f.total - sumPdf : null;
   $("#sheet").innerHTML = top + `<div class="form">
+    ${f.fuente === "pdf" ? `<p class="p"><b>${esc(f.card)}</b> · estado de cuenta que se paga en <b>${mesNom(mp)} ${mp.slice(0, 4)}</b>${f.vence ? ` · vence el ${dShort(f.vence)}` : ""}</p>` : ""}
+    ${dif != null ? (Math.abs(dif) <= 1 ? `<p class="msg good" style="margin:0">${ic("check")}<span>Cuadra: las compras y cargos del PDF suman ${money(sumPdf)}, igual al total facturado.</span></p>`
+      : `<p class="msg warn" style="margin:0">${ic("info")}<span>Las líneas reconocidas suman ${money(sumPdf)} y el total facturado es ${money(f.total)}: diferencia de ${money(dif)}. Puede ser saldo anterior, intereses o líneas que no reconocí.</span></p>`) : ""}
     <p class="p"><b>${f.rows.length}</b> líneas reconocidas · <b>${sel.length}</b> para importar por <b>${money(tot)}</b>.</p>
     ${f.total && !(t && Number(t.facturado)) ? `<button type="button" class="chk-row" data-act="imp-total" role="checkbox" aria-checked="${!!f.useTotal}"><span class="chk" aria-hidden="true">${ic("check")}</span><span>Usar el total facturado que encontré: <b>${money(f.total)}</b></span></button>` : ""}
     ${fact ? `<p class="msg good">${ic("check")}<span>Lo sin detallar baja de ${money(Math.max(0, fact - det))} a <b>${money(Math.max(0, fact - det - tot))}</b>.</span></p>` : ""}
@@ -1197,15 +1381,31 @@ function renderImport() {
 async function importar() {
   const f = S.form; if (!f || !f.imp) return;
   const sel = f.rows.filter(r => r.on && r.cat);
-  if (!sel.length) return toast("Marca al menos una compra con categoría.");
   const now = new Date().toISOString();
-  const list = sel.map(r => ({ tipo: "Gasto", categoria: r.cat, concepto: r.desc, monto: r.monto, dividir: 1, medio: f.card, estado: "", nota: "Importado del estado de cuenta", fecha: r.iso, mesPago: S.mes, consumo: r.iso.slice(0, 7), creado: now, actualizado: now }));
-  if (!addMany("movs", list)) return;
-  if (f.total && f.useTotal) {
-    const cur = S.tcs.find(t => t.mesPago === S.mes && t.tarjeta === f.card) || {};
-    if (!Number(cur.facturado)) { const data = { mesPago: S.mes, tarjeta: f.card, facturado: f.total, estado: cur.estado || "Pendiente", nota: cur.nota || "", actualizado: now }; const v = cur.vence || venceTc(S.mes, f.card); if (v) data.vence = v; await S.db.doc("tarjetas/" + S.mes + "_" + slug(f.card)).set(data); }
+  if (f.doc === "cartola") {
+    const c = f.cartola, list = sel.map(r => r.tipo === "abono"
+      ? { tipo: "Ingreso", categoria: r.cat, concepto: r.desc, monto: r.monto, dividir: 1, medio: CTA_BCHILE, estado: "Pagado", nota: "Importado de la cartola Banco de Chile", fecha: r.iso, mesPago: r.iso.slice(0, 7), consumo: "", creado: now, actualizado: now }
+      : { tipo: "Gasto", categoria: r.cat, concepto: r.desc, monto: r.monto, dividir: 1, medio: CTA_BCHILE, estado: "Pagado", nota: "Importado de la cartola Banco de Chile", fecha: r.iso, mesPago: r.iso.slice(0, 7), consumo: r.iso.slice(0, 7), creado: now, actualizado: now });
+    const cargos = f.rows.filter(r => r.tipo === "cargo");
+    STORE.cartolas = STORE.cartolas || {};
+    STORE.cartolas["bchile_" + (c.hasta || hoyIso()).slice(0, 7)] = { banco: "B.Chile", desde: c.desde, hasta: c.hasta, aprobado: (c.linea || {}).aprobado, utilizado: (c.linea || {}).utilizado, disponible: (c.linea || {}).disponible,
+      saldoInicial: c.saldoInicial, saldoFinal: c.saldoFinal, cargos: cargos.reduce((a, r) => a + r.monto, 0), abonos: f.rows.filter(r => r.tipo === "abono").reduce((a, r) => a + r.monto, 0),
+      intereses: cargos.filter(r => /interes|impuesto/.test(norm(r.desc))).reduce((a, r) => a + r.monto, 0), actualizado: now };
+    if (!addMany("movs", list)) return;
+    closeSheet(); toast(list.length ? `${list.length} movimientos del Banco de Chile importados` : "Resumen de la cartola guardado");
+    return;
   }
-  closeSheet(); toast(`${list.length} compras importadas por ${money(list.reduce((a, x) => a + x.monto, 0))}`);
+  if (!sel.length) return toast("Marca al menos una compra con categoría.");
+  const mp = f.mesPago || S.mes;
+  const list = sel.map(r => ({ tipo: "Gasto", categoria: r.cat, concepto: r.desc, monto: r.monto, dividir: 1, medio: f.card, estado: "", nota: "Importado del estado de cuenta", fecha: r.iso, mesPago: mp, consumo: r.iso.slice(0, 7), creado: now, actualizado: now }));
+  if (!addMany("movs", list)) return;
+  const cur = S.tcs.find(t => t.mesPago === mp && t.tarjeta === f.card) || {};
+  if ((f.total && f.useTotal && !Number(cur.facturado)) || (f.vence && !cur.vence && Number(cur.facturado))) {
+    const data = { mesPago: mp, tarjeta: f.card, facturado: Number(cur.facturado) || f.total || 0, estado: cur.estado || "Pendiente", nota: cur.nota || "", actualizado: now };
+    const v = cur.vence || f.vence || venceTc(mp, f.card); if (v) data.vence = v;
+    await S.db.doc("tarjetas/" + mp + "_" + slug(f.card)).set(data);
+  }
+  closeSheet(); toast(`${list.length} compras importadas por ${money(list.reduce((a, x) => a + x.monto, 0))}${mp !== S.mes ? " · estado de " + mesNom(mp) : ""}`);
 }
 
 /* ===================== aprende ===================== */
@@ -1565,23 +1765,30 @@ async function downloadCsv() {
   if (await shareFile("movimientos_" + (S.expScope === "mes" ? S.mes : "todo") + ".csv", "﻿" + body, "text/csv")) toast("CSV listo");
 }
 async function backupDown() {
-  const data = { app: "mis-finanzas", version: 1, exportado: new Date().toISOString(), movs: STORE.movs, tarjetas: STORE.tarjetas, config: STORE.config };
+  const data = { app: "mis-finanzas", version: 1, exportado: new Date().toISOString(), movs: STORE.movs, tarjetas: STORE.tarjetas, config: STORE.config, cartolas: STORE.cartolas || {} };
   const ok = await shareFile("respaldo_mis_finanzas_" + isoDay(new Date()) + ".json", JSON.stringify(data, null, 1), "application/json");
   if (ok) { STORE.meta = STORE.meta || {}; STORE.meta.ultimoRespaldo = new Date().toISOString(); saveStore(); toast("Respaldo listo"); render(); }
 }
 function parseBackup(txt) {
   const d = JSON.parse(txt);
   if (!d || d.app !== "mis-finanzas" || typeof d.movs !== "object") throw new Error("formato");
-  return { movs: d.movs || {}, tarjetas: d.tarjetas || {}, config: d.config || {}, n: Object.keys(d.movs || {}).length };
+  return { movs: d.movs || {}, tarjetas: d.tarjetas || {}, config: d.config || {}, cartolas: d.cartolas || {}, n: Object.keys(d.movs || {}).length };
 }
 function applyBackup(b) {
-  STORE = { movs: b.movs, tarjetas: b.tarjetas, config: b.config, meta: Object.assign({}, STORE && STORE.meta) };
+  STORE = { movs: b.movs, tarjetas: b.tarjetas, config: b.config, cartolas: b.cartolas || {}, meta: Object.assign({}, STORE && STORE.meta) };
   S.firstRun = false; S.pendingImport = null;
   if (!saveStore()) { toast("No se pudo guardar en el teléfono."); return; }
   S.win = null; subscribeMovs(); S.db.refresh();
   toast(b.n + " movimientos cargados"); render();
 }
 document.addEventListener("change", async e => {
+  if (e.target.id === "pdf-in") {
+    const file = e.target.files && e.target.files[0]; e.target.value = "";
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) return toast("El PDF es muy grande para leerlo en el teléfono.");
+    try { procesarPdf(await file.arrayBuffer()); } catch (err) { toast("No se pudo abrir el archivo."); }
+    return;
+  }
   if (e.target.id !== "restore-in") return;
   const file = e.target.files && e.target.files[0]; e.target.value = "";
   if (!file) return;
@@ -1641,6 +1848,8 @@ document.addEventListener("click", e => {
     case "imp-total": f.useTotal = !f.useTotal; renderImport(); break;
     case "imp-back": f.step = "paste"; renderImport(); break;
     case "imp-run": importar(); break;
+    case "pdf-open": { const i = document.getElementById("pdf-in"); if (i) i.click(); break; }
+    case "pdf-pass": { const i = $("#pdf-pass"), pw = i ? i.value : ""; if (!pw) { toast("Escribe la clave del PDF."); break; } if (f && f.bytes) procesarPdf(f.bytes, pw); break; }
     case "aho-add": { const r = resumen(S.mes); openSheet({ tipo: "Ahorro", monto: Math.max(0, r.meta - r.aho) }); break; }
     case "edit": { const x = S.movs.find(m => m.id === b.dataset.id); if (x) openSheet(Object.assign({}, x, { monto: Number(x.monto) || 0, dividir: Number(x.dividir) || 1, estado: x.estado || "Pagado", vence: x.vence || "" })); break; }
     case "sheet-close": closeSheet(); break;
@@ -1698,7 +1907,10 @@ document.addEventListener("change", e => {
 document.addEventListener("focusout", e => { if (e.target.id === "q" && S.pendingRender) setTimeout(() => { if (document.activeElement !== e.target) render(); }, 0); });
 const TABS = ["resumen", "movimientos", "tarjeta", "aprende", "ajustes"];
 function setHash() { try { history.replaceState(null, "", "#" + S.tab); } catch (e) { /* algunos visores no permiten cambiar la URL */ } }
-document.addEventListener("keydown", e => { if (e.key === "Escape" && S.form) closeSheet(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && S.form) closeSheet();
+  if (e.key === "Enter" && e.target && e.target.id === "pdf-pass") { e.preventDefault(); const b = document.querySelector('[data-act="pdf-pass"]'); if (b) b.click(); }
+});
 
 const h = (location.hash || "").replace("#", "");
 if (TABS.includes(h)) S.tab = h;
