@@ -13,6 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Mis Finanzas">
 <meta name="theme-color" content="#F3F5F9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
+<script>/* Tema elegido en Ajustes (se aplica antes de pintar para que no parpadee). */try{var t=localStorage.getItem("misfinanzas.tema");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -543,6 +544,19 @@ const ICONS = {
   target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'
 };
 const ic = (n, cls) => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[n] || ""}</svg>`;
+
+/* ===================== tema (preferencia de este teléfono, fuera del respaldo) ===================== */
+const TEMA_KEY = "misfinanzas.tema";
+const temaActual = () => { try { const t = localStorage.getItem(TEMA_KEY); return t === "light" || t === "dark" ? t : "auto"; } catch (e) { return "auto"; } };
+function aplicarTema(t) {
+  try { if (t === "auto") localStorage.removeItem(TEMA_KEY); else localStorage.setItem(TEMA_KEY, t); } catch (e) { /* sin almacenamiento */ }
+  if (t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+    const esOscura = /dark/.test(m.getAttribute("media") || "");
+    m.setAttribute("content", t === "dark" ? "#0B1220" : t === "light" ? "#F3F5F9" : esOscura ? "#0B1220" : "#F3F5F9");
+  });
+}
+aplicarTema(temaActual());
 
 /* ===================== estado ===================== */
 const S = {
@@ -1223,7 +1237,11 @@ function viewAjustes() {
     return `<div class="bud-row"><label for="b-${slug(x.n)}">${esc(x.n)}</label><div class="money"><span>$</span><input id="b-${slug(x.n)}" data-cat="${esc(x.n)}" class="bud-in" inputmode="numeric" data-money value="${fmtIn(cur)}" placeholder="0"></div>
       ${sg && sg.v !== cur ? `<button class="sug" data-act="sug" data-cat="${esc(x.n)}" data-v="${sg.v}">Sugerido ${money(sg.v)} · ${esc(sg.base)}</button>` : ""}</div>`; };
   const tcC = tcCfg(CARDS[0]), objs = objetivos();
+  const tema = temaActual();
   return topBar("Mis Finanzas", "Ajustes") + `<div class="wrap">
+  <section class="card"><div class="ch"><h2>Apariencia</h2></div>
+    <div class="seg" role="group" aria-label="Tema de la app">${[["auto", "Automático"], ["light", "Claro"], ["dark", "Oscuro"]].map(([k, l]) => `<button data-act="tema" data-v="${k}" aria-pressed="${tema === k}">${l}</button>`).join("")}</div>
+    <p class="note">${tema === "auto" ? "Automático sigue el modo claro u oscuro del iPhone." : "La app queda en modo " + (tema === "dark" ? "oscuro" : "claro") + " aunque el iPhone cambie. Se guarda solo en este teléfono."}</p></section>
   <section class="card"><div class="ch"><h2>Meta de ahorro mensual</h2></div>
     <div class="form">
       <div class="field"><label class="lb" for="cfg-meta">Meta mensual por defecto</label><div class="money"><span>$</span><input id="cfg-meta" inputmode="numeric" data-money value="${fmtIn(Number(c.metaAhorro) || 0)}"></div></div>
@@ -1603,6 +1621,7 @@ document.addEventListener("click", e => {
     case "fab": if (S.db) openSheet(); else toast("Sin conexión con tu base de datos."); break;
     case "falta": { const x = faltantes(S.mes).find(i => i.k === b.dataset.k); if (x && x.base) openSheet(Object.assign({}, x.base)); break; }
     case "falta-todas": anotarTodas(); break;
+    case "tema": aplicarTema(v); render(); { const n = document.querySelector(`[data-act="tema"][data-v="${v}"]`); if (n) n.focus({ preventScroll: true }); } toast(v === "auto" ? "Tema automático, como el iPhone" : v === "dark" ? "Modo oscuro activado" : "Modo claro activado"); break;
     case "ics": exportIcs(); break;
     case "obj-aportar": { const o = objetivos().find(x => x.id === b.dataset.id); if (o) openSheet({ tipo: "Ahorro", objetivo: o.id, monto: Number(v) || 0, concepto: o.nombre }); break; }
     case "obj-add": addObjetivo(); break;
