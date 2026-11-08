@@ -1820,13 +1820,17 @@ function renderFoto() {
   if (f.step === "texto") {
     const puedePegar = !!(navigator.clipboard && navigator.clipboard.readText);
     $("#sheet").innerHTML = top("Escanear boleta") + `<div class="form">
-      <ol class="steps-how" style="margin:0"><li>Toca el cuadro de abajo y vuelve a tocarlo: en el menú elige <b>Escanear texto</b>.</li>
-        <li>Apunta a la boleta con buena luz y toca <b>Insertar</b>. Si es larga, escanea la parte del <b>TOTAL</b> y la de la <b>fecha</b>: el texto se va sumando.</li></ol>
-      <div class="field"><label class="lb" for="scan-txt">Texto de la boleta</label><textarea class="txt area" id="scan-txt" rows="7" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Toca aquí y elige Escanear texto">${esc(f.text || "")}</textarea></div>
+      <div class="field"><span class="lb">Forma más fácil: copiar el texto de la foto</span>
+      <ol class="steps-how" style="margin:0"><li>Sácale una foto a la boleta con la <b>Cámara</b>.</li>
+        <li>Ábrela en <b>Fotos</b> y toca el botón <b>Texto en vivo</b> (abajo a la derecha, un recuadro con líneas).</li>
+        <li>Toca <b>Seleccionar todo</b> y luego <b>Copiar</b>.</li>
+        <li>Vuelve aquí y toca el botón de abajo. Si el iPhone muestra un globito <b>Pegar</b>, tócalo.</li></ol></div>
+      <button class="btn pri wide" data-act="${puedePegar ? "scan-paste" : "scan-focus"}">${ic("paste")}Pegar texto copiado</button>
+      <div class="field"><label class="lb" for="scan-txt">Texto de la boleta</label><textarea class="txt area" id="scan-txt" rows="6" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Aquí aparece el texto de la boleta">${esc(f.text || "")}</textarea></div>
       <div class="prev" id="scan-prev" aria-live="polite">${scanPrev(parseBoleta(f.text), !!f.text)}</div>
-      <button class="btn pri wide" data-act="scan-use">Usar estos datos</button>
-      ${puedePegar ? `<button class="btn sec wide" data-act="scan-paste">${ic("paste")}Pegar texto copiado</button>` : ""}
-      <p class="note" style="margin:0">¿No aparece <b>Escanear texto</b>? Abre la foto en Fotos, mantén presionado el texto, toca <b>Seleccionar todo</b> y <b>Copiar</b>, y pégalo aquí. Todo se lee dentro de tu iPhone: es gratis y no usa internet.</p></div>`;
+      <button class="btn sec wide" data-act="scan-use">Usar estos datos</button>
+      <p class="note" style="margin:0"><b>Otra forma:</b> toca el cuadro de texto, vuelve a tocarlo y elige <b>Escanear texto</b> (en algunas versiones está dentro de <b>Autorrellenar</b>); apunta a la boleta y toca <b>Insertar</b>.</p>
+      <p class="note" style="margin:0">¿No ves el botón Texto en vivo? Actívalo en <b>Configuración → General → Idioma y región → Texto en vivo</b> (necesita iPhone XS o más nuevo). Todo se lee dentro de tu iPhone: es gratis y no usa internet.</p></div>`;
     return;
   }
   if (f.step === "lista") {
@@ -2309,11 +2313,15 @@ document.addEventListener("click", e => {
     case "foto-open": fotoAbrir(); break;
     case "scan-open": scanAbrir(); break;
     case "scan-paste": navigator.clipboard.readText().then(t => {
-        if (!t) return toast("No hay texto copiado.");
+        if (!t || !t.trim()) return toast("No hay texto copiado: primero copia el texto de la foto en Fotos.");
         const ta = $("#scan-txt"); if (!ta) return;
         ta.value = (ta.value ? ta.value + "\n" : "") + t; ta.dispatchEvent(new Event("input", { bubbles: true }));
-      }).catch(() => toast("No pude leer lo copiado: mantén presionado el cuadro y elige Pegar."));
+        const p = parseBoleta(ta.value);
+        toast(p.total ? "Texto pegado: revisa lo que encontré y toca Usar estos datos" : "Texto pegado, pero no encuentro el TOTAL: copia la foto completa");
+        const pv = $("#scan-prev"); if (pv) pv.scrollIntoView({ block: "center", behavior: "smooth" });
+      }).catch(() => { toast("Mantén presionado el cuadro de texto y elige Pegar."); const ta = $("#scan-txt"); if (ta) ta.focus(); });
       break;
+    case "scan-focus": { const ta = $("#scan-txt"); if (ta) ta.focus(); toast("Mantén presionado el cuadro de texto y elige Pegar."); break; }
     case "scan-use": { const ta = $("#scan-txt"), p = parseBoleta(ta ? ta.value : (f && f.text) || "");
       if (!p.total && !p.fecha) { toast("No reconocí una boleta: escanea la parte que dice TOTAL."); break; }
       aplicarScan(p); break; }

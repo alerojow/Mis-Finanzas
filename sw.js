@@ -1,4 +1,4 @@
-const CACHE = "mf-app-v8";
+const CACHE = "mf-app-v9";
 const FONTS = "mf-fonts-v1";
 const LIBS = "mf-libs-v1"; /* lector de PDF (pdf.js) y SDK de Claude (lectura de boletas), versiones fijas: se guardan tras el primer uso */
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
