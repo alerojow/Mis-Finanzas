@@ -540,6 +540,12 @@ a { color: var(--pri); }
 .det-t small { display: block; font-size: 12.5px; color: var(--muted); }
 .det-t .ic { color: var(--muted); }
 .det-b { display: grid; gap: 14px; padding: 2px 0 0; }
+/* categorías propias */
+.ncbox { display: grid; gap: 10px; padding: 14px; border-radius: 16px; border: 1.5px dashed color-mix(in srgb, var(--gold) 55%, transparent); background: color-mix(in srgb, var(--gold) 5%, var(--card)); }
+.icos { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.icos button { aspect-ratio: 1; min-height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--soft); color: var(--muted); }
+.icos button .ic { width: 18px; height: 18px; }
+.icos button[aria-pressed="true"] { background: var(--pri-bg); color: var(--on-pri); }
 /* modo privado: oculta montos */
 .priv .hero-v, .priv .tri dd, .priv .mini dd, .priv .pa, .priv .mv-a, .priv .ct span, .priv .kv dd, .priv .kpi .big, .priv .k3 b, .priv .mtot b, .priv .sbar b,
 .priv .lg small, .priv .tbl td:not(:first-child), .priv .burn text.strong, .priv .burn .bud-t, .priv .pl-big, .priv .pl-sub, .priv .dtot, .priv .kl b,
@@ -637,7 +643,7 @@ const mi = x => (Number(x.monto) || 0) / Math.max(1, Number(x.dividir) || 1);
 const tipoDe = x => (CAT[x.categoria] ? CAT[x.categoria].t : x.tipo || "Gasto");
 const clasDe = c => (CAT[c] ? CAT[c].c : "Variable");
 const catColor = n => "var(" + CLSVAR[clasDe(n)] + ")";
-const saludo = () => { const h = new Date().getHours(); return h < 12 ? "Buenos días" : h < 20 ? "Buenas tardes" : "Buenas noches"; };
+const saludo = () => { const h = new Date().getHours(); return h >= 5 && h < 12 ? "Buenos días" : h >= 12 && h < 20 ? "Buenas tardes" : "Buenas noches"; };
 const addDays = (iso, n) => { const d = toD(iso); d.setDate(d.getDate() + n); return isoDay(d); };
 const daysBetween = (a, b) => Math.round((toD(b) - toD(a)) / 864e5);
 const mesesHasta = (desde, hasta) => (Number(hasta.slice(0, 4)) - Number(desde.slice(0, 4))) * 12 + Number(hasta.slice(5, 7)) - Number(desde.slice(5, 7));
@@ -677,9 +683,55 @@ const ICONS = {
   camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/>',
   scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 9h10M7 12h10M7 15h6"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  eyeOff: '<path d="M9.9 4.2A10 10 0 0 1 12 4c6.5 0 10 8 10 8a17 17 0 0 1-2.2 3.2M6.6 6.6A17 17 0 0 0 2 12s3.5 8 10 8a9.7 9.7 0 0 0 5.4-1.6M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/>'
+  eyeOff: '<path d="M9.9 4.2A10 10 0 0 1 12 4c6.5 0 10 8 10 8a17 17 0 0 1-2.2 3.2M6.6 6.6A17 17 0 0 0 2 12s3.5 8 10 8a9.7 9.7 0 0 0 5.4-1.6M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/>',
+  tag: '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+  paw: '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.05Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
+  scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
+  plane: '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  coffee: '<path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/>',
+  tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>'
 };
 const ic = (n, cls) => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[n] || ""}</svg>`;
+
+/* ===================== categorías propias (config.main.catsExtra, van en el respaldo) ===================== */
+const CATS_BASE = CATS.slice(), GASTO_BASE = CHIP_ORDER.Gasto.slice();
+const ICONOS_CAT = ["tag", "cart", "fork", "coffee", "gift", "heart", "paw", "scissors", "shirt", "ticket", "plane", "home", "tool", "book", "dumbbell", "fuel"];
+const catsExtra = () => { const l = (S && S.cfg && S.cfg.catsExtra) || []; return Array.isArray(l) ? l.filter(x => x && x.n) : []; };
+/* Suma las categorías propias al catálogo de la app (se llama antes de pintar). */
+function syncCats() {
+  const ex = catsExtra();
+  Object.keys(CAT).forEach(k => { if (CAT[k].custom) delete CAT[k]; });
+  CATS.length = 0; CATS_BASE.forEach(x => CATS.push(x));
+  ex.forEach(x => { if (CAT[x.n]) return; const o = { n: x.n, c: x.c === "Fijo" ? "Fijo" : "Variable", t: "Gasto", custom: true }; CATS.push(o); CAT[x.n] = o; CAT_ICON[x.n] = ICONOS_CAT.includes(x.i) ? x.i : "tag"; });
+  CHIP_ORDER.Gasto = GASTO_BASE.slice(0, TOP_N).concat(ex.map(x => x.n).filter(n => CAT[n] && CAT[n].custom), GASTO_BASE.slice(TOP_N));
+}
+function catForm(p) {
+  const clase = S.ncClase || "Variable", icono = S.ncIcon || "tag";
+  return `<div class="form ncat"><div class="field"><label class="lb" for="${p}-cnom">Nombre de la categoría</label><input class="txt" id="${p}-cnom" data-cnom autocomplete="off" maxlength="30" placeholder="Ej.: Mascotas, Peluquería, Feria" value="${esc(S.ncNom || "")}"></div>
+    <div class="field"><span class="lb">¿Qué tipo de gasto es?</span><div class="seg" role="group" aria-label="Tipo de gasto">${[["Variable", "Del día a día"], ["Fijo", "Cuenta fija mensual"]].map(([k, l]) => `<button type="button" data-act="nc-clase" data-v="${k}" aria-pressed="${clase === k}">${l}</button>`).join("")}</div></div>
+    <div class="field"><span class="lb">Ícono</span><div class="icos" role="group" aria-label="Ícono">${ICONOS_CAT.map(i => `<button type="button" data-act="nc-icon" data-v="${i}" aria-pressed="${icono === i}" aria-label="${i}">${ic(i)}</button>`).join("")}</div></div>
+    <div class="acts"><button type="button" class="btn pri" data-act="cat-crear" data-p="${p}">${p === "sh" ? "Crear y usar" : "Crear categoría"}</button>${p === "sh" ? `<button type="button" class="btn sec" data-act="f-ncat-no">Cancelar</button>` : ""}</div></div>`;
+}
+async function crearCat(p) {
+  const i = $("#" + p + "-cnom"), raw = (i ? i.value : "").replace(/\s+/g, " ").trim();
+  if (raw.length < 2) { toast("Escribe un nombre de al menos 2 letras."); if (i) i.focus(); return; }
+  const n = raw.charAt(0).toUpperCase() + raw.slice(1);
+  if (CATS.some(x => norm(x.n) === norm(n))) { toast(`Ya existe la categoría "${n}".`); return; }
+  if (!S.db) return toast("Sin conexión con tu base de datos.");
+  const nueva = { n, c: S.ncClase === "Fijo" ? "Fijo" : "Variable", i: S.ncIcon || "tag" };
+  await patchCfg({ catsExtra: catsExtra().concat([nueva]) });
+  if (!catsExtra().some(x => x.n === n)) S.cfg = Object.assign({}, S.cfg || {}, { catsExtra: catsExtra().concat([nueva]) });
+  syncCats(); S.ncClase = ""; S.ncIcon = ""; S.ncNom = "";
+  const f = S.form;
+  if (p === "sh" && f && !f.foto && !f.imp) { f.nuevaCat = false; f.categoria = n; S.moreCats = true; refreshAuto(); renderSheet(); }
+  else render();
+  toast(`Categoría "${n}" creada${p === "sh" ? " y elegida" : ""}`);
+}
+async function quitarCat(n) {
+  if (!S.db) return;
+  await patchCfg({ catsExtra: catsExtra().filter(x => x.n !== n) });
+  toast(`"${n}" quitada. Los gastos que ya tenías con ella se mantienen.`);
+}
 
 /* ===================== tema (preferencia de este teléfono, fuera del respaldo) ===================== */
 const TEMA_KEY = "misfinanzas.tema";
@@ -916,6 +968,7 @@ function ring(v, tone) {
 }
 
 function render() {
+  syncCats();
   const v = $("#view");
   const ae = document.activeElement;
   if (ae && v.contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) { S.pendingRender = true; return; }
@@ -936,7 +989,9 @@ function viewResumen() {
   if (S.firstRun) return onboardingView();
   const r = resumen(S.mes), prev = resumen(addM(S.mes, -1)), c = ciclo(S.mes);
   const hoyK = keyOf(new Date()), tM = diasMes(S.mes), dM = S.mes < hoyK ? tM : S.mes > hoyK ? 0 : new Date().getDate();
-  const head = topBar(saludo(), mesTit(), true) + `<div class="wrap" style="padding-bottom:0"><div class="mrow"><span>${dM === 0 ? "Mes por venir" : S.mes < hoyK ? "Mes cerrado" : "Día " + dM + " de " + tM}</span><div class="bar" aria-hidden="true"><i style="width:${dM / tM * 100}%"></i></div><span>${S.mes === hoyK ? (tM - dM) + " días por delante" : ""}</span></div></div>`;
+  /* Con nombre configurado: "Buenas tardes," + nombre arriba, y el mes pasa a la línea de progreso. */
+  const nom = String(cfg().nombre || "").trim(), estado = dM === 0 ? "por venir" : S.mes < hoyK ? "cerrado" : "día " + dM + " de " + tM;
+  const head = topBar(nom ? saludo() + "," : saludo(), nom ? esc(nom) : mesTit(), true) + `<div class="wrap" style="padding-bottom:0"><div class="mrow"><span>${nom ? `<b style="color:var(--ink)">${mesTit()}</b> · ${estado}` : cap(estado === "por venir" ? "mes por venir" : estado === "cerrado" ? "mes cerrado" : estado)}</span><div class="bar" aria-hidden="true"><i style="width:${dM / tM * 100}%"></i></div><span>${S.mes === hoyK ? "quedan " + (tM - dM) + " días" : ""}</span></div></div>`;
   const vacio = !r.rows.length && !r.porTc.length;
   const fal = faltantes(S.mes), sueldoPend = fal.some(x => x.k === "sueldo");
   if (vacio) return head + `<div class="wrap"><section class="card"><div class="ch"><h2>Aún no hay movimientos</h2></div><p class="p">No hay nada con pago en ${mesNom(S.mes)}. Toca <b>+</b> para registrar tu sueldo, tus cuentas o una compra.</p></section>${faltaCard(fal)}${paceCard(c)}${backupBanner()}</div>`;
@@ -1256,7 +1311,8 @@ function reglaCard(r) {
 /* ===================== movimientos ===================== */
 function viewMovs() {
   const F = [["todos", "Todos"], ["gastos", "Gastos"], ["tarjeta", "Tarjeta"], ["cuotas", "Cuotas"], ["ingresos", "Ingresos"], ["ahorro", "Ahorro"], ["pend", "Pendientes"]];
-  const r = resumen(S.mes), p = resumen(addM(S.mes, -1)), d = p.gas && r.ing ? r.gas / p.gas - 1 : null;
+  /* La comparación con el mes anterior solo cuando el mes está completo (si no, da alarmas falsas como −99%). */
+  const r = resumen(S.mes), p = resumen(addM(S.mes, -1)), d = p.gas && r.ing && !faltantes(S.mes).length ? r.gas / p.gas - 1 : null;
   return topBar(mesTit(), "Movimientos", false, true) + `<div class="wrap">
     <section class="card sumc"><div><span class="cap">Gastado en ${mesNom(S.mes)}</span><div class="sumv">${money(r.gas)}</div></div>
       ${d != null ? `<div><span class="cap">vs ${mesNom(p.mes)}</span><div class="sumd ${d <= 0 ? "good" : "bad"}">${d <= 0 ? "−" : "+"}${pct(Math.abs(d), 0)}</div></div>` : ""}</section>
@@ -2196,7 +2252,16 @@ function viewMetas() {
 }
 function viewAjustes() {
   const tema = temaActual(), iaK = iaClave();
+  const nom = String(cfg().nombre || ""), extra = catsExtra();
   return topBar("Mis Finanzas", "Ajustes") + `<div class="wrap">
+  <section class="card"><div class="ch"><h2>Tu saludo</h2></div>
+    <div class="form"><div class="field"><label class="lb" for="cfg-nom">¿Cómo te saludo?</label><input class="txt" id="cfg-nom" autocomplete="off" maxlength="40" placeholder="Ej.: Don Juan P." value="${esc(nom)}"></div>
+      <button class="btn sec wide" data-act="nom-save">Guardar saludo</button></div>
+    <p class="note">En Inicio verás "${saludo()}, ${esc(nom || "tu nombre")}": buenos días hasta las 12, buenas tardes hasta las 20 y buenas noches después. Se guarda en este teléfono y en tu respaldo.</p></section>
+  <section class="card"><div class="ch"><h2>${ic("plus")}Tus categorías</h2></div>
+    <p class="note" style="margin:0 0 12px">Crea categorías para los negocios o gastos que no calzan con las de la app (mascotas, peluquería, la feria de los domingos…). También puedes crearlas al registrar un gasto, en <b>Más categorías → Nueva</b>.</p>
+    ${extra.length ? `<ul class="rows" style="margin-bottom:12px">${extra.map(x => `<li class="act"><span class="cic" style="--c:${catColor(x.n)}">${ic(x.i || "tag")}</span><div><b>${esc(x.n)}</b><small>${x.c === "Fijo" ? "Cuenta fija" : "Gasto del día a día"}</small></div><span></span><button class="btn ghost sm" data-act="cat-del" data-v="${esc(x.n)}" aria-label="Quitar ${esc(x.n)}">Quitar</button></li>`).join("")}</ul>` : ""}
+    ${catForm("aj")}</section>
   <section class="card"><div class="ch"><h2>Apariencia</h2></div>
     <div class="seg" role="group" aria-label="Tema de la app">${[["auto", "Automático"], ["light", "Claro"], ["dark", "Oscuro"]].map(([k, l]) => `<button data-act="tema" data-v="${k}" aria-pressed="${tema === k}">${l}</button>`).join("")}</div>
     <p class="note">${tema === "auto" ? "Automático sigue el modo claro u oscuro del iPhone." : "La app queda en modo " + (tema === "dark" ? "oscuro" : "claro") + " aunque el iPhone cambie. Se guarda solo en este teléfono."}</p></section>
@@ -2282,6 +2347,7 @@ function renderSheet() {
   const f = S.form; if (!f || f.copy) return;
   if (f.imp) return renderImport();
   if (f.foto) return renderFoto();
+  syncCats();
   const objs = objetivos();
   const card = f.tipo === "Gasto" && isCard(f.medio);
   const cats = CHIP_ORDER[f.tipo] || [];
@@ -2300,7 +2366,8 @@ function renderSheet() {
       ${!f.id && !f.ia && f.tipo === "Gasto" ? `<div class="quick"><button type="button" data-act="scan-open">${ic("scan")}Escanear <span class="free">GRATIS</span></button><button type="button" data-act="foto-open">${ic("camera")}Con IA</button></div>
       <button type="button" class="lnk" data-act="scan-texto">¿Copiaste el texto de una foto? Pégalo aquí</button>` : ""}
       ${tpls.length ? `<div class="field"><span class="lb" id="lt">Repetir uno reciente</span><div class="chips" role="group" aria-labelledby="lt">${tpls.map(x => `<button type="button" class="chip" data-act="f-tpl" data-id="${esc(x.id)}">${esc(x.concepto || short(x.categoria))} · ${money(x.monto)}</button>`).join("")}</div></div>` : ""}
-      <div class="field"><span class="lb" id="lc">Categoría</span><div class="tiles" role="group" aria-labelledby="lc">${list.map(tile).join("")}${!showAll ? `<button type="button" class="tile more" data-act="f-more">${ic("plus")}<span>Más categorías</span></button>` : ""}</div></div>
+      <div class="field"><span class="lb" id="lc">Categoría</span><div class="tiles" role="group" aria-labelledby="lc">${list.map(tile).join("")}${!showAll ? `<button type="button" class="tile more" data-act="f-more">${ic("plus")}<span>Más categorías</span></button>` : f.tipo === "Gasto" && !f.nuevaCat ? `<button type="button" class="tile more" data-act="f-ncat">${ic("plus")}<span>Nueva categoría</span></button>` : ""}</div></div>
+      ${f.nuevaCat && f.tipo === "Gasto" ? `<div class="ncbox"><span class="lb">Nueva categoría</span>${catForm("sh")}</div>` : ""}
       ${f.tipo === "Ahorro" && objs.length ? `<div class="field"><span class="lb" id="lo">¿Para qué meta?</span><div class="chips" role="group" aria-labelledby="lo">${[{ id: "", nombre: "Sin meta" }].concat(objs).map(o => `<button type="button" class="chip" data-act="f-obj" data-v="${esc(o.id)}" aria-pressed="${(f.objetivo || "") === o.id}">${o.id ? ic("target") : ""}${esc(o.nombre)}</button>`).join("")}</div></div>` : ""}
       <div class="field"><label class="lb" for="f-concepto">Concepto (opcional)</label><input class="txt" id="f-concepto" autocomplete="off" placeholder="${f.tipo === "Gasto" ? "Ej.: Lider, Copec, gimnasio" : f.tipo === "Ingreso" ? "Ej.: sueldo de " + mesNom(S.mes) : "Ej.: fondo mutuo"}" value="${esc(f.concepto)}"></div>
       ${f.tipo === "Gasto" ? `<div class="field"><span class="lb" id="lm">¿Cómo pagaste?</span><div class="chips" role="group" aria-labelledby="lm">${MEDIOS.map(m => `<button type="button" class="chip" data-act="f-medio" data-v="${esc(m)}" aria-pressed="${f.medio === m}">${isCard(m) ? ic("card") : ""}${esc(m)}</button>`).join("")}</div></div>` : ""}
@@ -2633,6 +2700,14 @@ document.addEventListener("click", e => {
     case "falta-todas": anotarTodas(); break;
     case "falta-costos": anotarTodas(x => esCostoBanco(x.cat, x.nombre)); break;
     case "priv": togglePriv(); break;
+    case "nc-clase": S.ncClase = v; b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); break;
+    case "nc-icon": S.ncIcon = v; b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); break;
+    case "cat-crear": if (S.form && !S.form.foto && !S.form.imp && !S.form.copy) readForm(); crearCat(b.dataset.p); break;
+    case "cat-del": quitarCat(v); break;
+    case "nom-save": { const i = $("#cfg-nom"), nom = (i ? i.value : "").replace(/\s+/g, " ").trim().slice(0, 40);
+      if (!S.db) break; patchCfg({ nombre: nom }).then(() => toast(nom ? `Listo: ${saludo()}, ${nom}` : "Saludo sin nombre")); break; }
+    case "f-ncat": f.nuevaCat = true; S.ncNom = ""; S.ncClase = ""; S.ncIcon = ""; renderSheet(); setTimeout(() => { const i = $("#sh-cnom"); if (i) { i.focus(); i.scrollIntoView({ block: "center" }); } }, 60); break;
+    case "f-ncat-no": f.nuevaCat = false; renderSheet(); break;
     case "presu-open": S.tab = "metas"; S.open.presu = true; setHash(); render(); window.scrollTo(0, 0); break;
     case "tema": aplicarTema(v); render(); { const n = document.querySelector(`[data-act="tema"][data-v="${v}"]`); if (n) n.focus({ preventScroll: true }); } toast(v === "auto" ? "Tema automático, como el iPhone" : v === "dark" ? "Modo oscuro activado" : "Modo claro activado"); break;
     case "ics": exportIcs(); break;
@@ -2724,6 +2799,7 @@ document.addEventListener("input", e => {
   const t = e.target;
   if (t.id === "q") { S.q = t.value; const l = $("#mlist"); if (l) l.innerHTML = movList(); return; }
   if (t.id === "imp-txt" && S.form && S.form.imp) { S.form.text = t.value; return; }
+  if (t.hasAttribute("data-cnom")) { S.ncNom = t.value; return; }
   if (t.id === "scan-txt" && S.form && S.form.foto) { S.form.text = t.value; const p = $("#scan-prev"); if (p) p.innerHTML = scanPrev(parseBoleta(t.value), !!t.value.trim()); return; }
   if (t.id === "tc-corte" || t.id === "tc-pago") { t.value = String(digits(t.value) || "").slice(0, 2); return; }
   if (t.id === "f-monto" || t.hasAttribute("data-money")) {
