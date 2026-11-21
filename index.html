@@ -400,6 +400,9 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
 .ia-box { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 12px; border-radius: 16px; background: var(--infobg); color: var(--infoink); }
 .ia-box.warn { background: var(--warnbg); color: var(--warn); }
 .ia-box.nt { grid-template-columns: 1fr; }
+.cq-tot { display: grid; align-content: center; min-height: 52px; }
+.cq-tot b { font-size: 17px; font-variant-numeric: tabular-nums; }
+.cq-tot small { font-size: 12.5px; color: var(--muted); }
 .lnk { justify-self: center; min-height: 40px; padding: 0 8px; font-size: 13.5px; font-weight: 600; color: var(--pri); text-decoration: underline; text-underline-offset: 3px; }
 .ia-th { width: 56px; height: 72px; object-fit: cover; border-radius: 10px; background: var(--soft); }
 .ia-box b { display: block; font-size: 14px; }
@@ -1093,7 +1096,7 @@ function movList() {
 }
 function movRow(x) {
   const t = tipoDe(x);
-  const sub = [x.categoria, x.medio, Number(x.dividir) > 1 ? "÷" + x.dividir : ""].filter(Boolean).join(" · ");
+  const sub = [x.categoria, x.medio, cuotaTxt(x), Number(x.dividir) > 1 ? "÷" + x.dividir : ""].filter(Boolean).join(" · ");
   const cls = t === "Ingreso" ? "in" : t === "Ahorro" ? "sv" : "";
   const sign = t === "Ingreso" ? "+" : t === "Ahorro" ? "" : "−";
   return `<li><button class="mov" data-act="edit" data-id="${esc(x.id)}"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span>
@@ -1135,7 +1138,7 @@ function viewTarjeta() {
       <p class="note">El PDF se lee dentro de tu iPhone y no se sube a ningún lado. Si tiene clave, la app te la pide.</p></section>`;
     const curso = `<section class="card"><div class="ch"><h2>Compras en curso</h2><span class="tag warn">se pagan en ${mesNom(c.pago)}</span></div>
       ${c.per.corte ? `<p class="sub">Ciclo del ${dShort(c.per.ini)} al ${dShort(c.per.fin)}</p>` : ""}
-      ${c.n ? `<ul class="cats">${c.compras.slice().reverse().map(x => `<li><div class="crow"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span><div class="cm"><div class="ct"><b>${esc(x.concepto || x.categoria)}</b><span>${money(x.monto)}</span></div><small>${dLong(x.fecha)} · ${esc(x.categoria)}</small></div></div></li>`).join("")}</ul>
+      ${c.n ? `<ul class="cats">${c.compras.slice().reverse().map(x => `<li><div class="crow"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span><div class="cm"><div class="ct"><b>${esc(x.concepto || x.categoria)}</b><span>${money(x.monto)}</span></div><small>${dLong(x.fecha)} · ${esc(x.categoria)}${cuotaTxt(x) ? " · " + cuotaTxt(x) : ""}</small></div></div></li>`).join("")}</ul>
       <p class="note">Total ${money(c.gastado)} en ${c.n} ${c.n === 1 ? "compra" : "compras"}.${c.restantes > 0 && c.presVar ? ` Puedes gastar ${money(c.diaria)} al día sin pasarte.` : ""}</p>`
       : `<p class="p">Aún no registras compras con tarjeta en ${mesNom(S.mes)}. Una compra hecha hoy aparece en el estado de cuenta del mes siguiente: la app la asigna sola a ${mesNom(c.pago)}.</p>`}</section>`;
     return stmt + imp + curso;
@@ -2029,7 +2032,7 @@ function openSheet(base) {
   const today = new Date();
   /* Mes actual o futuro: la fecha es hoy (así una compra con tarjeta cae en el estado de cuenta correcto). Mes pasado: día 1, para registrar atrasados. */
   const fecha = S.mes >= keyOf(today) ? isoDay(today) : S.mes + "-01";
-  const f = Object.assign({ id: null, tipo: "Gasto", monto: 0, categoria: "", concepto: "", medio: "TC Scotiabank", fecha, dividir: 1, estado: "Pagado", nota: "", vence: "", mesManual: false, del: false }, base || {});
+  const f = Object.assign({ id: null, tipo: "Gasto", monto: 0, categoria: "", concepto: "", medio: "TC Scotiabank", fecha, dividir: 1, estado: "Pagado", nota: "", vence: "", mesManual: false, del: false, cuotas: 1, valorCuota: 0, vcManual: false }, base || {});
   if (!base || !base.id) {
     if (f.tipo === "Ingreso") { f.medio = "Transferencia"; f.categoria = f.categoria || "Sueldo"; }
     if (f.tipo === "Ahorro") { f.medio = "Transferencia"; f.categoria = "Ahorro e inversión"; }
@@ -2049,6 +2052,15 @@ function plantillas() {
   return out;
 }
 const shareHint = f => (f.tipo === "Gasto" && f.dividir > 1 && f.monto ? `Tu parte: <b>${money(f.monto / f.dividir)}</b> de ${money(f.monto)}` : "");
+/* Compras en cuotas (solo tarjeta de crédito, al registrar): se guardan como una cuota por mes de pago, unidas por "grupo". */
+const CUOTAS_OP = [1, 2, 3, 4, 6, 10, 12, 18, 24, 36];
+const enCuotas = f => !f.id && f.tipo === "Gasto" && isCard(f.medio) && Number(f.cuotas) > 1;
+const valorCuota = f => (f.vcManual && f.valorCuota ? Number(f.valorCuota) : Math.round((Number(f.monto) || 0) / Math.max(1, Number(f.cuotas) || 1)));
+const cuotaTxt = x => (Number(x.cuotas) > 1 && x.cuota ? `cuota ${x.cuota}/${x.cuotas}` : "");
+function cuotaTot(f) {
+  const N = Number(f.cuotas) || 1, tot = f.vcManual ? valorCuota(f) * N : Number(f.monto) || 0, extra = tot - (Number(f.monto) || 0);
+  return `<b>${money(tot)}</b><small>${!f.monto ? "" : extra > N ? "incluye " + money(extra) + " de interés" : "sin interés"}</small>`;
+}
 function renderSheet() {
   const f = S.form; if (!f || f.copy) return;
   if (f.imp) return renderImport();
@@ -2075,6 +2087,11 @@ function renderSheet() {
       ${f.tipo === "Ahorro" && objs.length ? `<div class="field"><span class="lb" id="lo">¿Para qué meta?</span><div class="chips" role="group" aria-labelledby="lo">${[{ id: "", nombre: "Sin meta" }].concat(objs).map(o => `<button type="button" class="chip" data-act="f-obj" data-v="${esc(o.id)}" aria-pressed="${(f.objetivo || "") === o.id}">${o.id ? ic("target") : ""}${esc(o.nombre)}</button>`).join("")}</div></div>` : ""}
       <div class="field"><label class="lb" for="f-concepto">Concepto (opcional)</label><input class="txt" id="f-concepto" autocomplete="off" placeholder="${f.tipo === "Gasto" ? "Ej.: Lider, Copec, gimnasio" : f.tipo === "Ingreso" ? "Ej.: sueldo de " + mesNom(S.mes) : "Ej.: fondo mutuo"}" value="${esc(f.concepto)}"></div>
       ${f.tipo === "Gasto" ? `<div class="field"><span class="lb" id="lm">¿Cómo pagaste?</span><div class="chips" role="group" aria-labelledby="lm">${MEDIOS.map(m => `<button type="button" class="chip" data-act="f-medio" data-v="${esc(m)}" aria-pressed="${f.medio === m}">${isCard(m) ? ic("card") : ""}${esc(m)}</button>`).join("")}</div></div>` : ""}
+      ${card && !f.id ? `<div class="field"><span class="lb" id="lq">¿En cuántas cuotas?</span><div class="chips" role="group" aria-labelledby="lq">${CUOTAS_OP.map(n => `<button type="button" class="chip" data-act="f-cuotas" data-v="${n}" aria-pressed="${(Number(f.cuotas) || 1) === n}">${n === 1 ? "Sin cuotas" : n + " cuotas"}</button>`).join("")}</div></div>
+        ${enCuotas(f) ? `<div class="two"><div class="field"><label class="lb" for="f-vcuota">Valor de cada cuota</label><div class="money"><span>$</span><input id="f-vcuota" inputmode="numeric" autocomplete="off" data-money value="${fmtIn(valorCuota(f))}"></div></div>
+          <div class="field"><span class="lb">Total a pagar</span><div class="cq-tot" id="cq-tot">${cuotaTot(f)}</div></div></div>
+          <p class="note" style="margin:-6px 0 0">Sin interés, deja el valor que calcula la app. Con interés, escribe el valor de la cuota que sale en el voucher o en el estado de cuenta.</p>` : ""}` : ""}
+      ${f.id && Number(f.cuotas) > 1 && f.grupo ? `<div class="exp" style="margin:0">Cuota ${f.cuota} de ${f.cuotas} de una compra${f.montoCompra ? " de " + money(f.montoCompra) : ""}. Lo que cambies aquí aplica solo a esta cuota.</div>` : ""}
       <div class="two">
         <div class="field"><label class="lb" for="f-fecha">Fecha</label><input class="txt" type="date" id="f-fecha" value="${esc(f.fecha)}"></div>
         <div class="field"><span class="lb">${verbo}</span><div class="paym"><button type="button" data-act="f-mes-prev" aria-label="Mes de pago anterior">${ic("chevL")}</button><span>${esc(cap(mesNom(f.mesPago)))}<small>${f.mesPago.slice(0, 4)}${card ? " · tarjeta" : ""}</small></span><button type="button" data-act="f-mes-next" aria-label="Mes de pago siguiente">${ic("chevR")}</button></div></div>
@@ -2085,7 +2102,8 @@ function renderSheet() {
       <div class="field"><label class="lb" for="f-nota">Nota (opcional)</label><input class="txt" id="f-nota" autocomplete="off" value="${esc(f.nota)}"></div>
       <div id="f-prev">${previewHTML()}</div>
       <div class="sh-actions">
-        ${f.del ? `<div class="confirm"><span>¿Eliminar este movimiento?</span><span class="row2"><button type="button" class="btn sec sm" data-act="f-del-no">No</button><button type="button" class="btn pri sm" data-act="f-del-yes">Eliminar</button></span></div>` : ""}
+        ${f.del && f.grupo && Number(f.cuotas) > 1 ? `<div class="confirm" style="display:grid;gap:8px"><span>¿Qué quieres eliminar?</span><button type="button" class="btn pri sm" data-act="f-del-all">La compra completa (${f.cuotas} cuotas)</button><button type="button" class="btn sec sm" data-act="f-del-yes">Solo esta cuota</button><button type="button" class="btn sec sm" data-act="f-del-no">No eliminar</button></div>`
+        : f.del ? `<div class="confirm"><span>¿Eliminar este movimiento?</span><span class="row2"><button type="button" class="btn sec sm" data-act="f-del-no">No</button><button type="button" class="btn pri sm" data-act="f-del-yes">Eliminar</button></span></div>` : ""}
         <button type="submit" class="btn pri wide" ${S.saving ? "disabled" : ""}>${S.saving ? "Guardando…" : f.id ? "Guardar cambios" : "Guardar " + f.tipo.toLowerCase()}</button>
         ${f.id && !f.del ? '<button type="button" class="btn ghost wide" data-act="f-del">Eliminar</button>' : ""}
       </div>
@@ -2096,6 +2114,7 @@ function impacto(f) {
   const o = { mesPago: f.mesPago, card, tipo: f.tipo, cat: f.categoria, ok: !!(f.monto && f.categoria) };
   if (!o.ok) return o;
   const g = Object.assign({}, f, { dividir: f.tipo === "Gasto" ? Number(f.dividir) || 1 : 1 });
+  if (enCuotas(f)) { g.monto = valorCuota(f); o.cuotas = Number(f.cuotas); o.vc = g.monto; o.tot = f.vcManual ? g.monto * o.cuotas : Number(f.monto) || 0; o.extra = o.tot - (Number(f.monto) || 0); }
   const D2 = { movs: S.movs.filter(x => x.id !== f.id).concat([g]), tcs: S.tcs };
   const r1 = resumen(f.mesPago), r2 = resumen(f.mesPago, D2);
   o.mi = mi(g); o.saldo2 = r2.saldo;
@@ -2114,7 +2133,11 @@ function previewHTML() {
   const o = impacto(f);
   if (!o.ok) return `<div class="prev muted">${ic("info")}<p>Escribe el monto y elige una categoría: aquí verás cómo afecta tu mes antes de guardar.</p></div>`;
   const L = [];
-  if (o.card) L.push(`Lo pagas en <b>${mesNom(o.mesPago)}</b>, con el estado de cuenta de la tarjeta.${o.mesPago !== S.mes ? ` Tu saldo de ${mesNom(S.mes)} no cambia.` : ""}`);
+  if (o.cuotas) {
+    const ult = addM(o.mesPago, o.cuotas - 1);
+    L.push(`Pagas <b>${o.cuotas} cuotas de ${money(o.vc)}</b>, de ${mesNom(o.mesPago)}${o.mesPago.slice(0, 4) !== ult.slice(0, 4) ? " " + o.mesPago.slice(0, 4) : ""} a ${mesNom(ult)} ${ult.slice(0, 4)}, con el estado de cuenta de la tarjeta.`);
+    if (o.extra > o.cuotas) L.push(`Con intereses pagas <b>${money(o.tot)}</b> en total: ${money(o.extra)} más que el precio.`);
+  } else if (o.card) L.push(`Lo pagas en <b>${mesNom(o.mesPago)}</b>, con el estado de cuenta de la tarjeta.${o.mesPago !== S.mes ? ` Tu saldo de ${mesNom(S.mes)} no cambia.` : ""}`);
   else if (o.tipo === "Gasto") L.push(`Sale de tu plata de <b>${mesNom(o.mesPago)}</b>: tu saldo libre queda en <b>${money(o.saldo2)}</b>.`);
   if (o.tipo === "Gasto") L.push(o.pres ? (o.cat2 <= o.pres ? `${esc(short(o.cat))}: te quedan <b>${money(o.pres - o.cat2)}</b> de ${money(o.pres)} en ${mesNom(o.mesPago)}.` : `${esc(short(o.cat))}: te pasas por <b>${money(o.cat2 - o.pres)}</b> en ${mesNom(o.mesPago)}.`) : `${esc(o.cat)} no tiene presupuesto: defínelo en Ajustes para que la app te avise.`);
   if (o.card && o.restantes > 0 && o.presVar) L.push(`Tu gasto diario disponible pasa de ${money(o.dia1)} a <b>${money(o.dia2)}</b>.`);
@@ -2130,6 +2153,7 @@ function updLive() {
   const f = S.form; if (!f) return;
   const h = $("#share-hint"); if (h) h.innerHTML = shareHint(f);
   const p = $("#f-prev"); if (p) p.innerHTML = previewHTML();
+  if (enCuotas(f)) { const q = $("#f-vcuota"), t = $("#cq-tot"); if (q && !f.vcManual && document.activeElement !== q) q.value = fmtIn(valorCuota(f)); if (t) t.innerHTML = cuotaTot(f); }
 }
 function readForm() {
   const f = S.form; if (!f || f.copy || f.imp || f.foto) return;
@@ -2139,6 +2163,7 @@ function readForm() {
   if (n) f.nota = n.value.trim();
   if (d && d.value) f.fecha = d.value;
   if (v) f.vence = v.value || "";
+  const q = $("#f-vcuota"); if (q && f.vcManual) f.valorCuota = digits(q.value);
 }
 function refreshAuto() { const f = S.form; if (f && !f.mesManual) Object.assign(f, autoMeses(f)); }
 
@@ -2156,21 +2181,34 @@ async function saveForm() {
                  mesPago: f.mesPago, consumo: f.consumo || "", actualizado: now, creado: f.creado || now };
   if (f.tipo === "Gasto" && !card && f.vence) data.vence = f.vence;
   if (f.tipo === "Ahorro" && f.objetivo) data.objetivo = f.objetivo;
+  if (f.id && f.grupo && Number(f.cuotas) > 1) Object.assign(data, { cuota: f.cuota, cuotas: f.cuotas, grupo: f.grupo, montoCompra: f.montoCompra || 0 });
+  const N = enCuotas(f) ? Number(f.cuotas) : 1;
   S.saving = true; renderSheet();
   try {
     if (f.id) await S.db.doc("movs/" + f.id).set(data);
+    else if (N > 1) {
+      /* Una cuota por mes de pago. Sin interés las cuotas suman exactamente el precio (la última ajusta el redondeo). */
+      const vc = valorCuota(f), grupo = "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      for (let k = 1; k <= N; k++) {
+        const monto = !f.vcManual && k === N ? f.monto - vc * (N - 1) : vc;
+        await S.db.collection("movs").add(Object.assign({}, data, { monto, mesPago: addM(f.mesPago, k - 1), cuota: k, cuotas: N, grupo, montoCompra: f.monto }));
+      }
+    }
     else await S.db.collection("movs").add(data);
-    const fuera = data.mesPago !== S.mes ? ` · se paga en ${mesNom(data.mesPago)}` : "";
-    toast(`Guardado: ${short(data.categoria)} ${money(data.monto / data.dividir)}${fuera}`);
+    const fuera = data.mesPago !== S.mes ? ` · ${N > 1 ? "la primera " : ""}se paga en ${mesNom(data.mesPago)}` : "";
+    toast(N > 1 ? `Guardado en ${N} cuotas de ${money(valorCuota(f) / data.dividir)}${fuera}` : `Guardado: ${short(data.categoria)} ${money(data.monto / data.dividir)}${fuera}`);
     S.saving = false; closeSheet();
   } catch (e) {
     S.saving = false; renderSheet();
     toast(e && e.code === "quota_exceeded" ? "El teléfono no tiene espacio: exporta y borra meses antiguos." : "No se pudo guardar. Intenta de nuevo.");
   }
 }
-async function deleteForm() {
+async function deleteForm(todas) {
   const f = S.form; if (!f || !f.id || !S.db) return;
-  try { await S.db.doc("movs/" + f.id).delete(); toast("Movimiento eliminado"); closeSheet(); }
+  try {
+    if (todas && f.grupo) { const ids = todosMovs().filter(x => x.grupo === f.grupo).map(x => x.id); for (const id of ids) await S.db.doc("movs/" + id).delete(); toast(`Compra eliminada (${ids.length} cuotas)`); }
+    else { await S.db.doc("movs/" + f.id).delete(); toast(f.grupo ? "Cuota eliminada" : "Movimiento eliminado"); }
+    closeSheet(); }
   catch (e) { toast("No se pudo eliminar. Intenta de nuevo."); }
 }
 async function togglePay(kind, id) {
@@ -2267,7 +2305,7 @@ function exportRows() {
 }
 function movCols(x) {
   return [x.mesPago ? x.mesPago + "-01" : "", x.consumo ? x.consumo + "-01" : "", x.fecha || "", x.categoria, x.concepto, Number(x.monto) || 0,
-          Number(x.dividir) || 1, x.medio || "", x.estado || "", x.nota || ""].map(clean);
+          Number(x.dividir) || 1, x.medio || "", x.estado || "", [cuotaTxt(x) ? cap(cuotaTxt(x)) + (x.montoCompra ? " de " + money(x.montoCompra) : "") : "", x.nota || ""].filter(Boolean).join(" · ")].map(clean);
 }
 async function copyText(txt, what) {
   try { await navigator.clipboard.writeText(txt); toast(what + " copiados. Pégalos en Excel."); }
@@ -2433,6 +2471,8 @@ document.addEventListener("click", e => {
     case "f-del": f.del = true; renderSheet(); break;
     case "f-del-no": f.del = false; renderSheet(); break;
     case "f-del-yes": deleteForm(); break;
+    case "f-del-all": deleteForm(true); break;
+    case "f-cuotas": f.cuotas = Number(v) || 1; f.vcManual = false; f.valorCuota = 0; renderSheet(); break;
     case "filtro": S.filtro = v; render(); break;
     case "tg": { const k = b.dataset.k; S.open[k] = !S.open[k]; render(); const n = document.querySelector(`[data-act="tg"][data-k="${k}"]`); if (n) n.focus({ preventScroll: true }); break; }
     case "pay": togglePay(b.dataset.kind, b.dataset.id); break;
@@ -2465,6 +2505,7 @@ document.addEventListener("input", e => {
   if (t.id === "f-monto" || t.hasAttribute("data-money")) {
     const n = digits(t.value); t.value = fmtIn(n);
     if (t.id === "f-monto" && S.form) { S.form.monto = n; updLive(); }
+    if (t.id === "f-vcuota" && S.form) { S.form.vcManual = n > 0; S.form.valorCuota = n; updLive(); }
   }
 });
 document.addEventListener("change", e => {
