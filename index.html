@@ -11,47 +11,50 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mis Finanzas">
-<meta name="theme-color" content="#F3F5F9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
-<script>/* Tema elegido en Ajustes (se aplica antes de pintar para que no parpadee). */try{var t=localStorage.getItem("misfinanzas.tema");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#070E1E" media="(prefers-color-scheme: dark)">
+<script>/* Tema elegido en Ajustes (se aplica antes de pintar para que no parpadee). Sin elección: oscuro "Banca privada". */try{var t=localStorage.getItem("misfinanzas.tema")||"dark";if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);if(localStorage.getItem("misfinanzas.privado")==="1")document.documentElement.classList.add("priv");}catch(e){document.documentElement.setAttribute("data-theme","dark");}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Mis Finanzas v2 · "Coach": cada cifra con su explicación; gráficos de ritmo, composición y comparativo. */
+/* Mis Finanzas v3 · "Banca privada": azul noche y dorado (oscuro) / marfil, azul marino y dorado (claro). */
 :root {
-  --bg: #F3F5F9; --card: #FFFFFF; --ink: #0F172A; --muted: #4B5567; --line: #E2E7EE; --soft: #EDF1F7; --ctl: #7C8899;
-  --pri: #1E3A8A; --pri-bg: #1E3A8A; --on-pri: #FFFFFF;
-  --good: #047857; --goodbg: #E6F5EE; --on-good: #FFFFFF; --warn: #9A4D06; --warnbg: #FCF1DF; --bad: #B42318; --badbg: #FCE9E7;
-  --infobg: #EAF0FC; --infoink: #1E3A8A;
-  --fijo: #3657A6; --var: #C9821A; --deu: #A23B5E; --aho: #0E8A5F; --lib: #CBD3DF;
-  --k1: #1E3A8A; --k2: #0E8A5F; --k3: #C9821A; --k4: #7C4DCC; --k5: #0E7C99; --k6: #B8336A;
+  --bg: #F6F4EF; --card: #FFFFFF; --ink: #0B1530; --muted: #565E70; --line: #E6E1D5; --soft: #F0ECE3; --ctl: #8A8F9C;
+  --pri: #7A5C17; --pri-bg: #0B1530; --on-pri: #F3E3B5; --gold: #B8913D;
+  --good: #0F7A55; --goodbg: #E5F4EE; --on-good: #FFFFFF; --warn: #95560A; --warnbg: #FBF1DF; --bad: #B42318; --badbg: #FCE9E7;
+  --infobg: #F4EDDD; --infoink: #5E4610;
+  --fijo: #2F4F9E; --var: #B8862A; --deu: #A23B5E; --aho: #0E8A5F; --lib: #D9D4C8;
+  --k1: #0B1530; --k2: #0E8A5F; --k3: #B8862A; --k4: #7C4DCC; --k5: #0E7C99; --k6: #B8336A;
   --navbg: rgba(255, 255, 255, .94);
-  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 10px 24px -18px rgba(15, 23, 42, .28);
+  --shadow: 0 1px 2px rgba(11, 21, 48, .05), 0 10px 26px -18px rgba(11, 21, 48, .28);
+  --plastic: linear-gradient(140deg, #13204A 0%, #0B1530 55%, #2A2410 100%); --plastic-ink: #F6EBD0;
   --font: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0B1220; --card: #141D2F; --ink: #E8EDF5; --muted: #A3B0C2; --line: #26324A; --soft: #1B2539; --ctl: #7D8AA0;
-    --pri: #8AA8FF; --pri-bg: #2F54D6; --on-pri: #FFFFFF;
-    --good: #4CD69A; --goodbg: rgba(76, 214, 154, .14); --on-good: #0B1220; --warn: #F2B24C; --warnbg: rgba(242, 178, 76, .15); --bad: #FF8A80; --badbg: rgba(255, 138, 128, .15);
-    --infobg: #17244A; --infoink: #C9D7FF;
-    --fijo: #7EA2FF; --var: #E8B04A; --deu: #E58AAE; --aho: #4CD69A; --lib: #3A4760;
-    --k1: #7EA2FF; --k2: #4CD69A; --k3: #E8B04A; --k4: #B79BFF; --k5: #52D1E0; --k6: #E58AAE;
-    --navbg: rgba(20, 29, 47, .92); --shadow: 0 10px 24px -18px rgba(0, 0, 0, .6);
+    --bg: #070E1E; --card: #0F1A30; --ink: #EEF1F7; --muted: #A2ADC1; --line: #1E2A44; --soft: #16223B; --ctl: #7D8AA0;
+    --pri: #D9B972; --pri-bg: #D4B26A; --on-pri: #1A1405; --gold: #D4B26A;
+    --good: #5DD4A0; --goodbg: rgba(93, 212, 160, .13); --on-good: #07140E; --warn: #F0B95C; --warnbg: rgba(240, 185, 92, .13); --bad: #FF8C80; --badbg: rgba(255, 140, 128, .14);
+    --infobg: rgba(212, 178, 106, .10); --infoink: #EAD7A6;
+    --fijo: #8FB0FF; --var: #E3A94C; --deu: #E58AAE; --aho: #5DD4A0; --lib: #2E3A55;
+    --k1: #D4B26A; --k2: #5DD4A0; --k3: #8FB0FF; --k4: #B79BFF; --k5: #52D1E0; --k6: #E58AAE;
+    --navbg: rgba(10, 18, 36, .92); --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 30px -16px rgba(0, 0, 0, .75);
+    --plastic: linear-gradient(140deg, #1B2440 0%, #0C1226 45%, #2A2410 100%); --plastic-ink: #F6EBD0;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0B1220; --card: #141D2F; --ink: #E8EDF5; --muted: #A3B0C2; --line: #26324A; --soft: #1B2539; --ctl: #7D8AA0;
-  --pri: #8AA8FF; --pri-bg: #2F54D6; --on-pri: #FFFFFF;
-  --good: #4CD69A; --goodbg: rgba(76, 214, 154, .14); --on-good: #0B1220; --warn: #F2B24C; --warnbg: rgba(242, 178, 76, .15); --bad: #FF8A80; --badbg: rgba(255, 138, 128, .15);
-  --infobg: #17244A; --infoink: #C9D7FF;
-  --fijo: #7EA2FF; --var: #E8B04A; --deu: #E58AAE; --aho: #4CD69A; --lib: #3A4760;
-  --k1: #7EA2FF; --k2: #4CD69A; --k3: #E8B04A; --k4: #B79BFF; --k5: #52D1E0; --k6: #E58AAE;
-  --navbg: rgba(20, 29, 47, .92); --shadow: 0 10px 24px -18px rgba(0, 0, 0, .6);
+  --bg: #070E1E; --card: #0F1A30; --ink: #EEF1F7; --muted: #A2ADC1; --line: #1E2A44; --soft: #16223B; --ctl: #7D8AA0;
+  --pri: #D9B972; --pri-bg: #D4B26A; --on-pri: #1A1405; --gold: #D4B26A;
+  --good: #5DD4A0; --goodbg: rgba(93, 212, 160, .13); --on-good: #07140E; --warn: #F0B95C; --warnbg: rgba(240, 185, 92, .13); --bad: #FF8C80; --badbg: rgba(255, 140, 128, .14);
+  --infobg: rgba(212, 178, 106, .10); --infoink: #EAD7A6;
+  --fijo: #8FB0FF; --var: #E3A94C; --deu: #E58AAE; --aho: #5DD4A0; --lib: #2E3A55;
+  --k1: #D4B26A; --k2: #5DD4A0; --k3: #8FB0FF; --k4: #B79BFF; --k5: #52D1E0; --k6: #E58AAE;
+  --navbg: rgba(10, 18, 36, .92); --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 30px -16px rgba(0, 0, 0, .75);
+  --plastic: linear-gradient(140deg, #1B2440 0%, #0C1226 45%, #2A2410 100%); --plastic-ink: #F6EBD0;
   color-scheme: dark;
 }
 
@@ -275,7 +278,7 @@ button.crow { border-radius: 12px; }
 .chips::-webkit-scrollbar { display: none; }
 .chip { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); font-size: 14px; font-weight: 500; white-space: nowrap; background: var(--card); }
 .chip .ic { width: 16px; height: 16px; }
-.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--card); }
+.chip[aria-pressed="true"] { background: color-mix(in srgb, var(--gold) 15%, var(--card)); border-color: var(--gold); color: var(--pri); font-weight: 600; }
 .mtot { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); margin: 2px 2px 0; }
 .mtot b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .mg h3 { margin: 10px 2px 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
@@ -357,7 +360,7 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
 .tab { min-height: 56px; display: grid; justify-items: center; align-content: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--muted); }
 .tab .ic { width: 24px; height: 24px; }
 .tab[aria-current="page"] { color: var(--pri); }
-.plus { justify-self: center; align-self: start; margin-top: -20px; width: 58px; height: 58px; border-radius: 50%; background: var(--pri-bg); color: var(--on-pri); display: grid; place-items: center; box-shadow: 0 10px 20px -8px rgba(30, 58, 138, .6), 0 0 0 5px var(--bg); }
+.plus { justify-self: center; align-self: start; margin-top: -20px; width: 58px; height: 58px; border-radius: 20px; background: var(--pri-bg); color: var(--on-pri); display: grid; place-items: center; box-shadow: 0 12px 24px -10px color-mix(in srgb, var(--pri-bg) 70%, transparent), 0 0 0 5px var(--bg); }
 .plus .ic { width: 26px; height: 26px; stroke-width: 2.4; }
 .plus:active { transform: scale(.96); }
 
@@ -449,6 +452,100 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
 .toast { position: fixed; z-index: 30; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translate(-50%, 8px); background: var(--ink); color: var(--card); padding: 10px 16px; border-radius: 12px; font-size: 14px; max-width: calc(100% - 32px); width: max-content; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 @media (max-width: 360px) { .bud-row { grid-template-columns: 1fr 128px; } .top h1 { font-size: 21px; } .mini dd { font-size: 13.5px; } }
+
+/* ===================== v3 · Banca privada ===================== */
+a { color: var(--pri); }
+.card { border-radius: 22px; padding: 18px; }
+.ch h2 .ic { color: var(--gold); }
+.cap { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* encabezado de mes compacto */
+.mrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--muted); font-weight: 500; padding: 0 2px; }
+.mrow .bar { flex: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.mrow .bar i { display: block; height: 100%; background: var(--gold); border-radius: 2px; }
+/* héroe: lo que te quedaría libre */
+.hero { background: linear-gradient(160deg, color-mix(in srgb, var(--gold) 9%, var(--card)) 0%, var(--card) 62%); border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent); }
+.hero-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: -6px -6px -4px 0; }
+.hero-h .ib { width: 40px; height: 40px; background: transparent; border-color: color-mix(in srgb, var(--gold) 30%, transparent); color: var(--pri); }
+.sec-h { text-align: left; }
+.hero-v { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.hero-v.neg { color: var(--bad); }
+.hero-s { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.45; }
+.tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 0; }
+.tri div { background: var(--soft); border-radius: 14px; padding: 10px; min-width: 0; }
+.tri dt { font-size: 11.5px; color: var(--muted); }
+.tri dd { margin: 2px 0 0; font-size: 14.5px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tri small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.hero .btn { margin-top: 14px; }
+/* salud compacta */
+.hs { display: flex; gap: 14px; align-items: center; }
+.hs .ring { width: 56px; height: 56px; flex: none; }
+.hs .ring svg { width: 56px; height: 56px; }
+.hs .ring b { font-size: 17px; }
+.hs .ring small { display: none; }
+.hs p { margin: 0; font-size: 14px; line-height: 1.45; }
+.hs p b { display: block; font-size: 15px; }
+/* listas compactas (próximos pagos, para completar) */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.rows li:first-child { border-top: 0; padding-top: 2px; }
+.rows .cic { width: 40px; height: 40px; border-radius: 13px; }
+.rows b { display: block; font-size: 14.5px; font-weight: 600; line-height: 1.3; }
+.rows small { display: block; font-size: 12.5px; color: var(--muted); }
+.rows .r { text-align: right; white-space: nowrap; }
+.rows .r b { font-variant-numeric: tabular-nums; }
+.rows .r small.w { color: var(--warn); font-weight: 600; }
+.rows .r small.bad { color: var(--bad); font-weight: 600; }
+.rows li.act { grid-template-columns: 40px 1fr auto auto; }
+.more-l { display: block; width: 100%; min-height: 44px; margin-top: 4px; font-size: 13.5px; font-weight: 600; color: var(--pri); text-align: center; }
+.sec-h { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 48px; padding: 4px 4px 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+.sec-h small { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+/* movimientos */
+.sumc { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+.sumv { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.sumd { font-size: 14px; font-weight: 600; text-align: right; }
+.sumd.good { color: var(--good); } .sumd.bad { color: var(--bad); }
+.mg h3 { display: flex; justify-content: space-between; }
+.mg h3 .dtot { font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.qtag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: color-mix(in srgb, var(--gold) 16%, transparent); color: var(--pri); margin-left: 6px; vertical-align: 1px; }
+.mov.mgrp .mv-m small { white-space: normal; }
+.subl { background: var(--soft); }
+.subl .mov { padding-left: 30px; min-height: 52px; }
+/* tarjeta de crédito como plástico */
+.plastic { position: relative; overflow: hidden; border-radius: 24px; padding: 20px; color: var(--plastic-ink); background: var(--plastic); box-shadow: 0 22px 40px -20px rgba(4, 8, 20, .7); border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent); }
+.plastic::after { content: ""; position: absolute; right: -70px; top: -90px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, .13), transparent); pointer-events: none; }
+.pl-top { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; }
+.pl-chip { width: 38px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #EBD69E, #B8954A); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.pl-lb { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .75; margin-top: 22px; }
+.pl-big { font-size: 34px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.pl-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; opacity: .92; }
+.pl-cupo { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .18); margin-top: 8px; overflow: hidden; }
+.pl-cupo i { display: block; height: 100%; background: #E2C47E; border-radius: 3px; }
+.pl-sub { font-size: 12px; opacity: .85; }
+.pl-tag { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, .14); }
+.pl-tag.ok { background: rgba(93, 212, 160, .22); color: #BFF5DC; }
+.acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.acts.three { grid-template-columns: 1fr 1fr 1fr; }
+.acts .btn { padding: 0 10px; font-size: 14px; }
+/* registro: el monto primero */
+.amount.v3 { display: flex; justify-content: center; align-items: baseline; gap: 4px; border: 0; padding: 14px 0 0; }
+.amount.v3 span { font-size: 26px; }
+.amount.v3 input { font-size: 46px; text-align: center; width: auto; min-width: 2ch; max-width: 100%; field-sizing: content; }
+.amount.v3 input::placeholder { color: color-mix(in srgb, var(--muted) 45%, transparent); }
+.quick { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.quick button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--soft); font-size: 13.5px; font-weight: 600; }
+.quick .ic { width: 17px; height: 17px; }
+.quick .free { font-size: 10px; font-weight: 700; color: var(--good); background: var(--goodbg); padding: 2px 6px; border-radius: 6px; }
+.det-t { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border-radius: 15px; background: var(--soft); text-align: left; min-height: 52px; }
+.det-t b { display: block; font-size: 14px; }
+.det-t small { display: block; font-size: 12.5px; color: var(--muted); }
+.det-t .ic { color: var(--muted); }
+.det-b { display: grid; gap: 14px; padding: 2px 0 0; }
+/* modo privado: oculta montos */
+.priv .hero-v, .priv .tri dd, .priv .mini dd, .priv .pa, .priv .mv-a, .priv .ct span, .priv .kv dd, .priv .kpi .big, .priv .k3 b, .priv .mtot b, .priv .sbar b,
+.priv .lg small, .priv .tbl td:not(:first-child), .priv .burn text.strong, .priv .burn .bud-t, .priv .pl-big, .priv .pl-sub, .priv .dtot, .priv .kl b,
+.priv .rows .r b, .priv .sumv, .priv .hero-s b, .priv .kpi p, .priv .goal .ct span { filter: blur(7px); }
+.hero-v, .tri dd, .pl-big, .rows .r b, .sumv, .mv-a { transition: filter .25s ease; }
+@media (prefers-reduced-motion: reduce) { .hero-v, .tri dd, .pl-big, .rows .r b, .sumv, .mv-a { transition: none; } }
 </style>
 </head>
 <body>
@@ -458,7 +555,7 @@ input[type="date"].txt { -webkit-appearance: none; appearance: none; display: fl
   <button class="tab" data-act="tab" data-tab="movimientos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Movimientos</button>
   <button class="plus" data-act="fab" aria-label="Registrar movimiento"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tab" data-act="tab" data-tab="tarjeta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg>Bancos</button>
-  <button class="tab" data-act="tab" data-tab="aprende"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>Aprende</button>
+  <button class="tab" data-act="tab" data-tab="metas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Metas</button>
 </div></nav>
 <div class="scrim" id="scrim" data-act="sheet-close"></div>
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title"></section>
@@ -578,21 +675,34 @@ const ICONS = {
   paste: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
   target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/>',
-  scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 9h10M7 12h10M7 15h6"/>'
+  scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 9h10M7 12h10M7 15h6"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M9.9 4.2A10 10 0 0 1 12 4c6.5 0 10 8 10 8a17 17 0 0 1-2.2 3.2M6.6 6.6A17 17 0 0 0 2 12s3.5 8 10 8a9.7 9.7 0 0 0 5.4-1.6M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/>'
 };
 const ic = (n, cls) => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[n] || ""}</svg>`;
 
 /* ===================== tema (preferencia de este teléfono, fuera del respaldo) ===================== */
 const TEMA_KEY = "misfinanzas.tema";
-const temaActual = () => { try { const t = localStorage.getItem(TEMA_KEY); return t === "light" || t === "dark" ? t : "auto"; } catch (e) { return "auto"; } };
+/* Sin elección guardada = oscuro ("Banca privada"). "auto" se guarda explícito para seguir al iPhone. */
+const temaActual = () => { try { const t = localStorage.getItem(TEMA_KEY); return t === "light" || t === "auto" ? t : "dark"; } catch (e) { return "dark"; } };
 function aplicarTema(t) {
-  try { if (t === "auto") localStorage.removeItem(TEMA_KEY); else localStorage.setItem(TEMA_KEY, t); } catch (e) { /* sin almacenamiento */ }
+  try { localStorage.setItem(TEMA_KEY, t); } catch (e) { /* sin almacenamiento */ }
   if (t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
     const esOscura = /dark/.test(m.getAttribute("media") || "");
-    m.setAttribute("content", t === "dark" ? "#0B1220" : t === "light" ? "#F3F5F9" : esOscura ? "#0B1220" : "#F3F5F9");
+    m.setAttribute("content", t === "dark" ? "#070E1E" : t === "light" ? "#F6F4EF" : esOscura ? "#070E1E" : "#F6F4EF");
   });
 }
+/* Modo privado: oculta los montos (preferencia de este teléfono). */
+const PRIV_KEY = "misfinanzas.privado";
+function togglePriv() {
+  const on = !document.documentElement.classList.contains("priv");
+  document.documentElement.classList.toggle("priv", on);
+  try { localStorage.setItem(PRIV_KEY, on ? "1" : "0"); } catch (e) { /* sin almacenamiento */ }
+  document.querySelectorAll("[data-act=priv]").forEach(b => { b.setAttribute("aria-pressed", String(on)); b.innerHTML = ic(on ? "eyeOff" : "eye"); });
+  toast(on ? "Montos ocultos" : "Montos visibles");
+}
+const eyeBtn = () => { const on = document.documentElement.classList.contains("priv"); return `<button class="ib" data-act="priv" aria-pressed="${on}" aria-label="Ocultar o mostrar montos">${ic(on ? "eyeOff" : "eye")}</button>`; };
 aplicarTema(temaActual());
 
 /* ===================== estado ===================== */
@@ -690,7 +800,7 @@ function salud(mes, D) {
   const sp = !cs.length ? 1 : !conP.length ? 0.5 : okc.length / conP.length;
   const sinTxt = sinP.length ? ` · ${sinP.length} sin presupuesto` : "";
   P.push({ label: "Presupuesto", w: 25, score: sp, ok: sp >= 1 && !sinP.length,
-    txt: !cs.length ? "Aún sin gastos" : !conP.length ? "Las categorías con gasto no tienen presupuesto: agrégalo en Ajustes" : malas.length ? `${okc.length} de ${conP.length} dentro · revisa ${malas.map(o => short(o.n)).join(", ")}${sinTxt}` : `Todo dentro de lo previsto${sinTxt}` });
+    txt: !cs.length ? "Aún sin gastos" : !conP.length ? "Las categorías con gasto no tienen presupuesto: agrégalo en Metas" : malas.length ? `${okc.length} de ${conP.length} dentro · revisa ${malas.map(o => short(o.n)).join(", ")}${sinTxt}` : `Todo dentro de lo previsto${sinTxt}` });
   const sd = r.fact ? Math.max(0, Math.min(1, r.det / r.fact)) : 1;
   P.push({ label: "Tarjeta detallada", w: 20, score: sd, ok: sd >= 0.95, txt: r.fact ? `${pct(sd, 0)} de ${money(r.fact)} registrado por categoría` : "Sin estado de cuenta este mes" });
   const sr = !c.dia || !c.base || c.proy <= c.base ? 1 : c.base / c.proy;
@@ -795,8 +905,8 @@ async function boot() {
 
 /* ===================== piezas de vista ===================== */
 const mesTit = () => cap(mesNom(S.mes)) + " " + S.mes.slice(0, 4);
-function topBar(small, title, gear) {
-  return `<header class="top"><div class="tt"><small>${small}</small><h1>${title}</h1></div><div class="tr">${gear ? `<button class="ib lbl" data-act="tab" data-tab="ajustes">${ic("sliders")}<span>Ajustes</span></button>` : ""}<div class="ms"><button data-act="mes-prev" aria-label="Mes anterior">${ic("chevL")}</button><button data-act="mes-next" aria-label="Mes siguiente">${ic("chevR")}</button></div></div></header>`;
+function topBar(small, title, gear, eye) {
+  return `<header class="top"><div class="tt"><small>${small}</small><h1>${title}</h1></div><div class="tr">${eye ? eyeBtn() : ""}${gear ? `<button class="ib lbl" data-act="tab" data-tab="ajustes">${ic("sliders")}<span>Ajustes</span></button>` : ""}<div class="ms"><button data-act="mes-prev" aria-label="Mes anterior">${ic("chevL")}</button><button data-act="mes-next" aria-label="Mes siguiente">${ic("chevR")}</button></div></div></header>`;
 }
 const infoBtn = k => `<button class="info" data-act="tg" data-k="${k}" aria-expanded="${!!S.open[k]}" aria-label="¿Qué significa?">${ic("info")}</button>`;
 const explain = (k, h) => (S.open[k] ? `<div class="exp" role="note">${h}</div>` : "");
@@ -814,7 +924,7 @@ function render() {
   if (S.status === "loading") { v.innerHTML = loadingView(); return; }
   const banner = S.status === "nodb" ? `<div class="sysbanner">No hay conexión con tu base de datos.</div>` :
                  S.status === "err" ? `<div class="sysbanner">Se perdió la conexión con tus datos. Recarga la página para reintentar.</div>` : "";
-  const fn = { resumen: viewResumen, movimientos: viewMovs, tarjeta: viewTarjeta, aprende: viewAprende, ajustes: viewAjustes }[S.tab] || viewResumen;
+  const fn = { resumen: viewResumen, movimientos: viewMovs, tarjeta: viewTarjeta, metas: viewMetas, aprende: viewAprende, ajustes: viewAjustes }[S.tab] || viewResumen;
   v.innerHTML = banner + fn();
 }
 function loadingView() {
@@ -826,20 +936,88 @@ function viewResumen() {
   if (S.firstRun) return onboardingView();
   const r = resumen(S.mes), prev = resumen(addM(S.mes, -1)), c = ciclo(S.mes);
   const hoyK = keyOf(new Date()), tM = diasMes(S.mes), dM = S.mes < hoyK ? tM : S.mes > hoyK ? 0 : new Date().getDate();
-  const head = topBar(saludo(), mesTit(), true) + `<div class="wrap" style="padding-bottom:0"><div class="month"><div class="row"><span>${dM === 0 ? "Mes por venir" : S.mes < hoyK ? "Mes cerrado" : "Día " + dM + " de " + tM}</span><span>${S.mes === hoyK ? (tM - dM) + " días por delante" : ""}</span></div><div class="bar" aria-hidden="true"><i style="width:${dM / tM * 100}%"></i></div></div></div>`;
+  const head = topBar(saludo(), mesTit(), true) + `<div class="wrap" style="padding-bottom:0"><div class="mrow"><span>${dM === 0 ? "Mes por venir" : S.mes < hoyK ? "Mes cerrado" : "Día " + dM + " de " + tM}</span><div class="bar" aria-hidden="true"><i style="width:${dM / tM * 100}%"></i></div><span>${S.mes === hoyK ? (tM - dM) + " días por delante" : ""}</span></div></div>`;
   const vacio = !r.rows.length && !r.porTc.length;
   const fal = faltantes(S.mes), sueldoPend = fal.some(x => x.k === "sueldo");
-  if (vacio) return head + `<div class="wrap">${backupBanner()}<section class="card"><div class="ch"><h2>Aún no hay movimientos</h2></div><p class="p">No hay nada con pago en ${mesNom(S.mes)}. Toca <b>+</b> para registrar tu sueldo, tus cuentas o una compra.</p></section>${faltaCard(fal)}${paceCard(c)}</div>`;
-  return head + `<div class="wrap">${backupBanner()}${heroCard(r, prev, fal)}${faltaCard(fal)}${paceCard(c)}${paysCard()}${metasCard()}${catsCard(r)}${sueldoPend ? "" : ahorroCard(r) + donutCard(r)}${cmpCard(r, prev, sueldoPend)}${trendCard()}${sueldoPend ? "" : reglaCard(r)}</div>`;
+  if (vacio) return head + `<div class="wrap"><section class="card"><div class="ch"><h2>Aún no hay movimientos</h2></div><p class="p">No hay nada con pago en ${mesNom(S.mes)}. Toca <b>+</b> para registrar tu sueldo, tus cuentas o una compra.</p></section>${faltaCard(fal)}${paceCard(c)}${backupBanner()}</div>`;
+  const ana = S.open.ana ? (sueldoPend ? "" : ahorroCard(r) + donutCard(r)) + cmpCard(r, prev, sueldoPend) + trendCard() + (sueldoPend ? "" : reglaCard(r)) : "";
+  return head + `<div class="wrap">${heroLibre(r, prev, fal)}${paceCard(c)}${proxPagos()}${faltaCard(fal)}${saludCard()}${catsCard(r)}
+    <button class="sec-h" data-act="tg" data-k="ana" aria-expanded="${!!S.open.ana}"><span>Más análisis del mes<br><small>Ahorro, reparto del ingreso, comparación y tendencia</small></span>${ic("chevD", "rot")}</button>${ana}${backupBanner()}</div>`;
 }
+/* Lo primero que se ve: cuánto te queda (o quedaría) libre este mes. */
+function heroLibre(r, prev, fal) {
+  const sueldoPend = fal.some(x => x.k === "sueldo"), falta = Math.max(0, r.meta - r.aho);
+  const v = fal.length ? r.saldo + fal.reduce((a, x) => a + x.efecto, 0) : r.saldo;
+  const lbl = fal.length ? "Te quedaría libre este mes" : v < 0 ? "Este mes te falta" : "Te queda libre este mes";
+  const sub = fal.length ? `Estimado al cierre, con ${mesNom(prev.mes)} como referencia${falta > 0 ? ", antes de apartar tu ahorro" : ""}.` :
+    !r.ing ? "Registra tu sueldo para saber cuánto tienes disponible." :
+    v < 0 ? "Sale más de lo que entra: revisa qué gastos puedes mover." :
+    falta > 0 ? `Después de pagar todo. Aún te falta apartar <b>${money(falta)}</b> de ahorro.` : "Meta de ahorro cumplida.";
+  const dG = prev.gas && !fal.length ? r.gas / prev.gas - 1 : null;
+  return `<section class="card hero" aria-label="Resumen del mes"><div class="hero-h"><span class="cap">${lbl}</span>${eyeBtn()}</div>
+    <div class="hero-v${v < 0 ? " neg" : ""}">${money(v)}</div><p class="hero-s">${sub}</p>
+    <dl class="tri"><div><dt>Ingresos</dt><dd>${money(r.ing)}</dd>${sueldoPend ? "<small>sueldo pendiente</small>" : ""}</div>
+      <div><dt>Gastos</dt><dd>${money(r.gas)}</dd>${dG != null ? `<small>${dG <= 0 ? "−" : "+"}${pct(Math.abs(dG), 0)} vs ${mesCorto(prev.mes)}</small>` : ""}</div>
+      <div><dt>Ahorro</dt><dd>${money(r.aho)}</dd><small>de ${money(r.meta)}</small></div></dl>
+    ${falta > 0 && r.ing && !sueldoPend ? `<button class="btn pri wide" data-act="aho-add">${ic("trend")}Apartar ${money(falta)} de ahorro</button>` : ""}</section>`;
+}
+/* Salud financiera en una línea, con la acción que más suma. */
+function saludCard() {
+  const s = salud(S.mes);
+  const low = s.pillars.filter(p => !p.ok).sort((a, b) => b.w * (1 - b.score) - a.w * (1 - a.score))[0];
+  return `<section class="card"><div class="hs">${ring(s.score, s.tone)}<p><b>Salud financiera: ${esc(s.label.toLowerCase())}</b>${low ? low.label + ": " + low.txt : "Vas muy bien: mantén el ritmo."}</p></div>
+    <button class="disc" data-act="tg" data-k="salud" aria-expanded="${!!S.open.salud}">${ic("info")}<span>¿Cómo se calcula?</span>${ic("chevD", "rot")}</button>
+    ${S.open.salud ? `<ul class="pill">${s.pillars.map(x => `<li><span class="pi ${x.ok ? "good" : "warn"}">${ic(x.ok ? "check" : "alert")}</span><div><b>${x.label}</b><small>${x.txt}</small></div><span class="pv">${Math.round(x.score * x.w)}<i>/${x.w}</i></span></li>`).join("")}</ul>
+      <p class="note">El puntaje va de 0 a 100 y mira cuatro hábitos: apartar el ahorro, respetar el presupuesto, detallar la tarjeta y mantener el ritmo de gasto.</p>` : ""}</section>`;
+}
+/* Los 3 pagos pendientes más próximos; "Ver todos" abre la lista completa con sus checks. */
+function proxPagos() {
+  if (S.open.pays) return paysCard();
+  const pg = pagos(S.mes); if (!pg.length) return "";
+  const pend = pg.filter(x => x.estado === "Pendiente"), totP = pend.reduce((a, x) => a + x.monto, 0);
+  const row = x => {
+    const m = x.kind === "mov" ? S.movs.find(y => y.id === x.id) : null, cat = m ? m.categoria : "";
+    const dd = dayDiff(x.fecha), cls = x.vence ? (dd < 0 ? "bad" : dd <= 3 ? "w" : "") : "";
+    const when = x.vence ? (dd < 0 ? "venció " + rel(x.fecha) : rel(x.fecha)) : "sin fecha";
+    return `<li class="act"><span class="cic" style="--c:${x.kind === "tc" ? "var(--gold)" : catColor(cat)}">${ic(x.kind === "tc" ? "card" : CAT_ICON[cat] || "card")}</span>
+      <div><b>${esc(x.nombre)}</b><small>${x.kind === "tc" ? "Estado de cuenta" : x.div > 1 ? "Tu parte ÷" + x.div : esc(cat)}</small></div>
+      <div class="r"><b>${money(x.monto)}</b><small class="${cls}">${when}</small></div>
+      <button class="chk" data-act="pay" data-kind="${x.kind}" data-id="${esc(x.id)}" aria-pressed="false" aria-label="${esc(x.nombre)} pagado">${ic("check")}</button></li>`;
+  };
+  return `<section class="card"><div class="ch"><h2>Próximos pagos</h2><span class="tag ${pend.length ? "warn" : "good"}">${pend.length ? money(totP) + " por pagar" : "Todo pagado"}</span></div>
+    ${pend.length ? `<ul class="rows">${pend.slice(0, 3).map(row).join("")}</ul>` : `<p class="p">Pagaste todo lo de ${mesNom(S.mes)}.</p>`}
+    <button class="more-l" data-act="tg" data-k="pays">Ver los ${pg.length} pagos del mes</button></section>`;
+}
+/* Cargos chicos del banco (intereses, impuestos, comisiones, IVA): se muestran juntos en una fila. */
+const esCostoBanco = (cat, nombre) => cat === "Bancos y créditos" && /interes|impuesto|i\.?t\.?e\b|comision|\biva\b|mantenc|seguro|sobregiro|timbre/.test(norm(nombre));
 function faltaCard(fal) {
   if (!fal.length) return "";
-  return `<section class="card"><div class="ch"><h2>Para completar ${mesNom(S.mes)}</h2><span class="tag warn">${fal.length} ${fal.length === 1 ? "pendiente" : "pendientes"}</span></div>
-    <ul class="pays">${fal.map(x => `<li class="fal"><span class="cic" style="--c:${catColor(x.cat)}">${ic(CAT_ICON[x.cat] || "card")}</span>
-      <div class="pm"><b>${esc(x.nombre)}</b><small>${esc(x.ref)}</small></div><span class="pa">${x.efecto >= 0 ? "+" : "−"}${money(x.monto)}</span>
-      ${x.tc ? `<button class="btn sec sm" data-act="tab" data-tab="tarjeta">Ir</button>` : `<button class="btn sec sm" data-act="falta" data-k="${esc(x.k)}" aria-label="Anotar ${esc(x.nombre)}">Anotar</button>`}</li>`).join("")}</ul>
-    ${(() => { const n = fal.filter(x => x.base && x.base.tipo === "Gasto").length; return n > 1 ? `<button class="btn pri wide" data-act="falta-todas" style="margin-top:12px">Anotar las ${n} cuentas como pendientes</button>` : ""; })()}
-    <p class="note">Toca <b>Anotar</b> y la app llena el monto del mes anterior: solo revisa y guarda.${fal.some(x => x.k === "sueldo") ? " Cuando anotes tu sueldo verás cómo se reparte tu ingreso y la regla 50/30/20." : ""}</p></section>`;
+  const costos = fal.filter(x => !x.tc && esCostoBanco(x.cat, x.nombre)), resto = fal.filter(x => !costos.includes(x));
+  const filas = resto.slice();
+  if (costos.length > 1) filas.push({ k: "_costos", nombre: "Costos del banco", ref: costos.length + " cargos: intereses, impuestos y comisiones", monto: costos.reduce((a, x) => a + x.monto, 0), efecto: -1, cat: "Bancos y créditos", grupo: true });
+  else filas.push(...costos);
+  const ver = S.open.fal ? filas : filas.slice(0, 4);
+  const n = fal.filter(x => x.base && x.base.tipo === "Gasto").length;
+  return `<section class="card"><div class="ch"><h2>Para completar ${mesNom(S.mes)}</h2><span class="tag warn">${filas.length} ${filas.length === 1 ? "pendiente" : "pendientes"}</span></div>
+    <ul class="rows">${ver.map(x => `<li class="act"><span class="cic" style="--c:${catColor(x.cat)}">${ic(CAT_ICON[x.cat] || "card")}</span>
+      <div><b>${esc(nombreLimpio(x.nombre, x.cat))}</b><small>${esc(x.ref)}</small></div><div class="r"><b>${x.efecto >= 0 ? "+" : "−"}${money(x.monto)}</b></div>
+      ${x.tc ? `<button class="btn sec sm" data-act="tab" data-tab="tarjeta">Ir</button>` : x.grupo ? `<button class="btn sec sm" data-act="falta-costos">Anotar</button>` : `<button class="btn sec sm" data-act="falta" data-k="${esc(x.k)}" aria-label="Anotar ${esc(x.nombre)}">Anotar</button>`}</li>`).join("")}</ul>
+    ${filas.length > 4 ? `<button class="more-l" data-act="tg" data-k="fal">${S.open.fal ? "Ver menos" : "Ver " + (filas.length - 4) + " más"}</button>` : ""}
+    ${n > 1 ? `<button class="btn pri wide" data-act="falta-todas" style="margin-top:8px">Anotar las ${n} cuentas como pendientes</button>` : ""}
+    <p class="note">Anotar llena el monto del mes anterior: solo revisa y guarda.</p></section>`;
+}
+/* Nombres del banco más legibles (solo para mostrar; el dato guardado no cambia). */
+function nombreLimpio(s, cat) {
+  let t = String(s || "");
+  if (cat !== "Bancos y créditos" && !/^[A-ZÁÉÍÓÚÑ0-9 .\/-]+$/.test(t)) return t;
+  const n = norm(t);
+  const DIC = [[/^i\.?t\.?e\.? sobregiro no pactado/, "Impuesto por sobregiro no pactado"], [/^i\.?t\.?e\.?\b/, "Impuesto (ITE)"], [/^iva por comision/, "IVA de comisiones y cargos"],
+    [/^comision mantencion/, "Comisión de mantención del plan"], [/^intereses? por sobregiro/, "Intereses por sobregiro"], [/^pago interes(es)? lin/, "Pago de intereses de la línea"],
+    [/^intereses? linea/, "Intereses de la línea de crédito"], [/^impuesto linea/, "Impuesto de la línea de crédito"]];
+  for (const [re, v] of DIC) if (re.test(n)) return v;
+  if (cat !== "Bancos y créditos" || t.trim().split(/\s+/).length < 3) return t;
+  t = t.toLowerCase().replace(/\bcomision\b/g, "comisión").replace(/\bmantencion\b/g, "mantención").replace(/\binteres\b/g, "interés").replace(/\blinea\b/g, "línea").replace(/\bcredito\b/g, "crédito").replace(/\biva\b/g, "IVA");
+  return t.charAt(0).toUpperCase() + t.slice(1);
 }
 /* Guarda varios documentos de una vez (cuentas del mes, compras importadas). */
 function addMany(col, list) {
@@ -848,8 +1026,8 @@ function addMany(col, list) {
   if (!saveStore()) { toast("El teléfono no tiene espacio para guardar."); return false; }
   S.firstRun = false; S.db.refresh(); return true;
 }
-function anotarTodas() {
-  const fal = faltantes(S.mes).filter(x => x.base && x.base.tipo === "Gasto");
+function anotarTodas(pred) {
+  const fal = faltantes(S.mes).filter(x => x.base && x.base.tipo === "Gasto" && (!pred || pred(x)));
   if (!fal.length) return;
   const hoy = new Date(), now = hoy.toISOString(), fecha = keyOf(hoy) === S.mes ? isoDay(hoy) : S.mes + "-01";
   const list = fal.map(x => {
@@ -935,13 +1113,13 @@ function paceCard(c) {
   const ref = c.fuente === "estado" ? `tu último estado de cuenta (${money(c.base)})` : `tu presupuesto de ${money(c.base)}`;
   let top;
   if (c.cerrado) top = `<p class="p">Compraste <b>${money(c.gastado)}</b> con tarjeta en ${c.n} ${c.n === 1 ? "compra" : "compras"}. Se pagan en ${mesNom(c.pago)}.${c.base ? ` Tu referencia es ${ref}.` : ""}</p>`;
-  else if (!c.base) top = `<p class="p">Llevas <b>${money(c.gastado)}</b> con tarjeta. Define tu presupuesto variable en Ajustes para saber cuánto puedes gastar al día.</p>`;
+  else if (!c.base) top = `<p class="p">Llevas <b>${money(c.gastado)}</b> con tarjeta. Define tu presupuesto variable en Metas para saber cuánto puedes gastar al día.</p>`;
   else top = `<div class="kpi"><small>Puedes gastar</small><div class="big">${money(c.diaria)}<span> al día</span></div><p>${c.diaria > 0 ? `durante los ${c.restantes} días que quedan, para no pasarte de ${ref}.` : `Ya llevas más que ${ref}.`}</p></div>`;
   const stats = `<div class="k3"><div><span><i style="background:var(--pri)"></i>Llevas</span><b>${money(c.gastado)}</b></div>
     <div><span><i style="background:var(--ctl)"></i>${c.cerrado ? "Referencia" : "Ideal a hoy"}</span><b>${money(c.cerrado ? c.base : c.ideal)}</b></div>
     <div><span><i style="background:var(${pasa ? "--bad" : "--good"})"></i>${c.cerrado ? (pasa ? "Te pasaste" : "Te sobró") : "Proyección"}</span><b class="${pasa ? "bad" : "good"}">${money(c.cerrado ? Math.abs(c.gastado - c.base) : c.proy)}</b></div></div>`;
   const msg = !c.cerrado && c.base ? `<p class="msg ${over ? "warn" : "good"}">${ic(over ? "alert" : "check")}<span>${over ? `A este ritmo llegarías a ${money(c.proy)}, <b>${money(c.proy - c.base)}</b> más que ${c.fuente === "estado" ? "tu último estado de cuenta" : "tu presupuesto"}.${c.diaria > 0 ? ` Con ${money(c.diaria)} al día llegas justo.` : ""}` : `Vas bajo el ritmo ideal. Si sigues así te sobran ${money(c.base - c.proy)}.`}</span></p>` : "";
-  const sinP = c.sinPres.length ? `<p class="msg warn">${ic("info")}<span>Aún no defines presupuesto para ${c.sinPres.map(short).join(", ")}.${c.fuente === "estado" ? ` Mientras tanto la app usa como referencia tu último estado de cuenta (${mesNom(c.refMes)}).` : ""}</span></p><button class="btn sec wide sm" data-act="tab" data-tab="ajustes" style="margin-top:8px">Definir presupuesto</button>` : "";
+  const sinP = c.sinPres.length ? `<p class="msg warn">${ic("info")}<span>Aún no defines presupuesto para ${c.sinPres.map(short).join(", ")}.${c.fuente === "estado" ? ` Mientras tanto la app usa como referencia tu último estado de cuenta (${mesNom(c.refMes)}).` : ""}</span></p><button class="btn sec wide sm" data-act="presu-open" style="margin-top:8px">Definir presupuesto</button>` : "";
   const perTxt = c.per.corte ? `<p class="note" style="margin:-4px 0 10px">Ciclo de facturación: ${dShort(c.per.ini)} al ${dShort(c.per.fin)} · se paga en ${mesNom(c.pago)}</p>` : "";
   return `<section class="card"><div class="ch"><h2>${c.cerrado ? (c.per.corte ? "Ciclo que se paga en " + mesNom(c.pago) : "Tarjeta en " + mesNom(c.mes)) : "Tu tarjeta, día a día"}</h2>${infoBtn("ritmo")}</div>${perTxt}${top}${burnSVG(c)}${stats}${msg}${sinP}
     ${explain("ritmo", `Lo que compras con la <b>TC Scotiabank</b> en ${mesNom(c.mes)} llega en el estado de cuenta que pagas en <b>${mesNom(c.pago)}</b>. Por eso no baja tu saldo de ${mesNom(c.mes)}: se descuenta del presupuesto de ${mesNom(c.pago)}. La línea punteada gris es el ritmo ideal (gastar parejo todo el mes) y la de color es la proyección si sigues igual.`)}</section>`;
@@ -960,7 +1138,8 @@ function paysCard() {
         <button class="chk" data-act="pay" data-kind="${x.kind}" data-id="${esc(x.id)}" aria-pressed="${paid}" aria-label="${esc(x.nombre)} pagado">${ic("check")}</button></li>`;
     }).join("")}</ul>
     ${(() => { const n = pend.filter(x => x.vence).length; return n ? `<button class="btn sec wide sm" data-act="ics" style="margin-top:10px">${ic("cal")}Agregar ${n} ${n === 1 ? "vencimiento" : "vencimientos"} al Calendario</button>` : ""; })()}
-    <p class="note">Toca el círculo cuando pagues. Si le pones fecha de vencimiento a una cuenta, se marca en naranjo 3 días antes.</p></section>`;
+    <p class="note">Toca el círculo cuando pagues. Si le pones fecha de vencimiento a una cuenta, se marca en naranjo 3 días antes.</p>
+    ${S.open.pays ? `<button class="more-l" data-act="tg" data-k="pays">Ver menos</button>` : ""}</section>`;
 }
 /* Archivo .ics con los vencimientos pendientes: el Calendario del iPhone los agrega con aviso el día anterior a las 9:00. */
 async function exportIcs() {
@@ -1044,14 +1223,14 @@ function cmpCard(r, prev, incompleto) {
     <p class="note">Verde = mejoró (más ingreso o ahorro, menos gasto). Rojo = empeoró.</p></section>`;
 }
 function trendCard() {
-  const months = [-5, -4, -3, -2, -1, 0].map(k => resumen(addM(S.mes, k)));
+  const months = [-5, -4, -3, -2, -1, 0].map(k => resumen(addM(S.mes, k))).filter((m, i) => i === 5 || m.ing || m.gas); /* sin meses vacíos */
   if (months.filter(m => m.ing || m.gas).length < 2) return "";
   const max = Math.max(1, ...months.map(m => Math.max(m.ing, m.gas)));
-  const W = 320, H = 150, top = 18, bot = 26, ch = H - top - bot, gw = W / 6;
+  const W = 320, H = 150, top = 18, bot = 26, ch = H - top - bot, gw = W / months.length;
   const y = v => top + ch - v / max * ch;
   let g = `<line x1="0" x2="${W}" y1="${top}" y2="${top}" style="stroke:var(--line)" stroke-dasharray="2 3"/><line x1="0" x2="${W}" y1="${top + ch}" y2="${top + ch}" style="stroke:var(--line)"/><text x="0" y="11" class="tx">${money(max)}</text>`;
   months.forEach((m, i) => {
-    const x0 = i * gw + gw / 2 - 15, cur = i === 5;
+    const x0 = i * gw + gw / 2 - 15, cur = i === months.length - 1;
     g += `<rect x="${x0}" y="${y(m.ing)}" width="13" height="${top + ch - y(m.ing)}" rx="2" style="fill:var(--pri);opacity:${cur ? 1 : .5}"/>`;
     g += `<rect x="${x0 + 16}" y="${y(m.gas)}" width="13" height="${top + ch - y(m.gas)}" rx="2" style="fill:var(--var);opacity:${cur ? 1 : .5}"/>`;
     if (m.aho > 0) g += `<circle cx="${x0 + 14.5}" cy="${y(m.aho)}" r="4" style="fill:var(--aho);stroke:var(--card)" stroke-width="1.5"/>`;
@@ -1076,72 +1255,91 @@ function reglaCard(r) {
 
 /* ===================== movimientos ===================== */
 function viewMovs() {
-  const F = [["todos", "Todos"], ["gastos", "Gastos"], ["ingresos", "Ingresos"], ["ahorro", "Ahorro"], ["tarjeta", "Tarjeta"], ["pend", "Pendientes"]];
-  return topBar(mesTit(), "Movimientos") + `<div class="wrap">
-    <label class="search">${ic("search")}<input id="q" type="search" placeholder="Buscar: Lider, Copec, luz…" value="${esc(S.q)}" aria-label="Buscar movimientos" autocomplete="off"></label>
+  const F = [["todos", "Todos"], ["gastos", "Gastos"], ["tarjeta", "Tarjeta"], ["cuotas", "Cuotas"], ["ingresos", "Ingresos"], ["ahorro", "Ahorro"], ["pend", "Pendientes"]];
+  const r = resumen(S.mes), p = resumen(addM(S.mes, -1)), d = p.gas && r.ing ? r.gas / p.gas - 1 : null;
+  return topBar(mesTit(), "Movimientos", false, true) + `<div class="wrap">
+    <section class="card sumc"><div><span class="cap">Gastado en ${mesNom(S.mes)}</span><div class="sumv">${money(r.gas)}</div></div>
+      ${d != null ? `<div><span class="cap">vs ${mesNom(p.mes)}</span><div class="sumd ${d <= 0 ? "good" : "bad"}">${d <= 0 ? "−" : "+"}${pct(Math.abs(d), 0)}</div></div>` : ""}</section>
+    <label class="search">${ic("search")}<input id="q" type="search" placeholder="Buscar comercio o categoría" value="${esc(S.q)}" aria-label="Buscar movimientos" autocomplete="off"></label>
     <div class="chips" role="group" aria-label="Filtrar">${F.map(([k, l]) => `<button class="chip" data-act="filtro" data-v="${k}" aria-pressed="${S.filtro === k}">${l}</button>`).join("")}</div>
     <div id="mlist" style="display:grid;gap:4px">${movList()}</div></div>`;
 }
 function movList() {
   const r = resumen(S.mes), q = norm(S.q);
-  const F = { todos: () => true, gastos: x => tipoDe(x) === "Gasto", ingresos: x => tipoDe(x) === "Ingreso", ahorro: x => tipoDe(x) === "Ahorro", tarjeta: x => isCard(x.medio), pend: x => x.estado === "Pendiente" };
-  const rows = r.rows.filter(F[S.filtro] || F.todos).filter(x => !q || norm([x.concepto, x.categoria, x.medio, x.nota].join(" ")).includes(q))
+  const F = { todos: () => true, gastos: x => tipoDe(x) === "Gasto", ingresos: x => tipoDe(x) === "Ingreso", ahorro: x => tipoDe(x) === "Ahorro", tarjeta: x => isCard(x.medio), cuotas: x => Number(x.cuotas) > 1, pend: x => x.estado === "Pendiente" };
+  const rows = r.rows.filter(F[S.filtro] || F.todos).filter(x => !q || norm([x.concepto, nombreLimpio(x.concepto, x.categoria), x.categoria, x.medio, x.nota].join(" ")).includes(q))
     .sort((a, b) => (b.fecha || "").localeCompare(a.fecha || "") || (b.creado || "").localeCompare(a.creado || ""));
   if (!rows.length) return `<p class="empty">${q ? "Nada coincide con tu búsqueda." : "Sin movimientos para este filtro."}<br>Toca <b>+</b> para registrar.</p>`;
   const tot = rows.reduce((a, x) => a + (tipoDe(x) === "Ingreso" ? 0 : mi(x)), 0);
   const groups = {};
   rows.forEach(x => { const k = x.fecha || "sin-fecha"; (groups[k] = groups[k] || []).push(x); });
   return `<p class="mtot"><span>${rows.length} ${rows.length === 1 ? "movimiento" : "movimientos"} con pago en ${mesNom(S.mes)}</span><span>Gastos <b>${money(tot)}</b></span></p>` +
-    Object.keys(groups).map(k => `<div class="mg"><h3>${k === "sin-fecha" ? "Sin fecha" : dLong(k)}</h3><ul>${groups[k].map(movRow).join("")}</ul></div>`).join("");
+    Object.keys(groups).map(k => {
+      const g = groups[k], dt = g.reduce((a, x) => a + (tipoDe(x) === "Gasto" ? mi(x) : 0), 0);
+      const costos = g.filter(x => esCostoBanco(x.categoria, x.concepto)), otros = g.filter(x => !costos.includes(x));
+      let html = otros.map(movRow).join("");
+      if (costos.length > 1) {
+        const kk = "bc-" + k, tc = costos.reduce((a, x) => a + mi(x), 0);
+        html = `<li><button class="mov mgrp" data-act="tg" data-k="${kk}" aria-expanded="${!!S.open[kk]}"><span class="cic" style="--c:${catColor("Bancos y créditos")}">${ic("bank")}</span>
+          <span class="mv-m"><b>Costos del banco</b><small>${costos.length} cargos: ${esc(costos.map(x => nombreLimpio(x.concepto, x.categoria).toLowerCase().replace(/\biva\b/g, "IVA")).slice(0, 3).join(", "))}${costos.length > 3 ? "…" : ""}</small></span>
+          <span class="mv-a">−${money(tc)}<small>${S.open[kk] ? "ocultar" : "ver detalle"}</small></span></button></li>${S.open[kk] ? `<li class="subl"><ul style="list-style:none;margin:0;padding:0">${costos.map(movRow).join("")}</ul></li>` : ""}` + html;
+      } else html = g.map(movRow).join("");
+      return `<div class="mg"><h3><span>${k === "sin-fecha" ? "Sin fecha" : dLong(k)}</span>${dt ? `<span class="dtot">−${money(dt)}</span>` : ""}</h3><ul>${html}</ul></div>`;
+    }).join("");
 }
 function movRow(x) {
   const t = tipoDe(x);
-  const sub = [x.categoria, x.medio, cuotaTxt(x), Number(x.dividir) > 1 ? "÷" + x.dividir : ""].filter(Boolean).join(" · ");
+  const sub = [x.categoria, x.medio, Number(x.dividir) > 1 ? "÷" + x.dividir : ""].filter(Boolean).join(" · ");
   const cls = t === "Ingreso" ? "in" : t === "Ahorro" ? "sv" : "";
   const sign = t === "Ingreso" ? "+" : t === "Ahorro" ? "" : "−";
   return `<li><button class="mov" data-act="edit" data-id="${esc(x.id)}"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span>
-    <span class="mv-m"><b>${esc(x.concepto || x.categoria)}</b><small>${esc(sub)}${x.estado === "Pendiente" ? " · <em>pendiente</em>" : ""}</small></span>
-    <span class="mv-a ${cls}">${sign}${money(mi(x))}${Number(x.dividir) > 1 ? `<small>de ${money(x.monto)}</small>` : ""}</span></button></li>`;
+    <span class="mv-m"><b>${esc(nombreLimpio(x.concepto, x.categoria) || x.categoria)}${Number(x.cuotas) > 1 && x.cuota ? `<span class="qtag">${x.cuota}/${x.cuotas}</span>` : ""}</b><small>${esc(sub)}${x.estado === "Pendiente" ? " · <em>pendiente</em>" : ""}</small></span>
+    <span class="mv-a ${cls}">${sign}${money(mi(x))}${Number(x.dividir) > 1 ? `<small>de ${money(x.monto)}</small>` : Number(x.cuotas) > 1 && x.montoCompra ? `<small>de ${money(x.montoCompra)}</small>` : ""}</span></button></li>`;
 }
 
 /* ===================== tarjeta ===================== */
 const tcDraft = {};
 function viewTarjeta() {
   const r = resumen(S.mes), c = ciclo(S.mes);
-  return topBar(mesTit(), "Bancos") + `<div class="wrap">` + CARDS.map(card => {
+  return topBar(mesTit(), "Bancos", false, true) + `<div class="wrap">` + CARDS.map(card => {
     const rows = r.rows.filter(x => x.medio === card);
     const t = r.porTc.find(x => x.tarjeta === card) || { tarjeta: card, facturado: "", estado: "Pendiente", det: rows.reduce((a, x) => a + (Number(x.monto) || 0), 0), sin: 0, n: rows.length };
     const f = Number(t.facturado) || 0, pd = f ? t.det / f : 0, id = slug(card), est = tcDraft[card] || t.estado || "Pendiente";
     const m = {}; rows.forEach(x => { m[x.categoria] = (m[x.categoria] || 0) + (Number(x.monto) || 0); });
     const cc = Object.entries(m).sort((a, b) => b[1] - a[1]);
-    const stmt = `<section class="card"><div class="ch"><h2>${ic("card")}${esc(card)}</h2><span class="tag ${est === "Pagado" ? "good" : "warn"}">${est}</span></div>
-      <p class="sub">Estado de cuenta que pagas en ${mesNom(S.mes)} · ${(() => { const pr = periodo(addM(S.mes, -1), card); return pr.corte ? "compras del " + dShort(pr.ini) + " al " + dShort(pr.fin) : "compras de " + mesNom(addM(S.mes, -1)); })()}${(t.vence || venceTc(S.mes, card)) ? " · vence el " + dShort(t.vence || venceTc(S.mes, card)) : ""}</p>
-      ${t.cupoTotal ? `<div class="field" style="margin:-4px 0 14px"><span class="lb">Cupo de la tarjeta</span><div class="cb" role="img" aria-label="Cupo usado ${pct((t.cupoUsado || 0) / t.cupoTotal, 0)}"><i style="width:${Math.min(100, (t.cupoUsado || 0) / t.cupoTotal * 100)}%;background:var(--pri)"></i></div>
-        <small class="note" style="margin:0">Usas ${money(t.cupoUsado || 0)} de ${money(t.cupoTotal)} (${pct((t.cupoUsado || 0) / t.cupoTotal, 0)})${t.minimo ? " · pago mínimo " + money(t.minimo) : ""}</small></div>` : ""}
+    const pr = periodo(addM(S.mes, -1), card), perTxt = pr.corte ? "compras del " + dShort(pr.ini) + " al " + dShort(pr.fin) : "compras de " + mesNom(addM(S.mes, -1));
+    const venc = t.vence || venceTc(S.mes, card), dd = venc ? dayDiff(venc) : null, pagado = est === "Pagado" && f > 0;
+    const cu = t.cupoTotal ? Math.min(1, (t.cupoUsado || 0) / t.cupoTotal) : 0, kEd = "tcedit-" + id;
+    const plastic = `<section class="plastic" aria-label="${esc(card)}"><div class="pl-top"><span>${esc(card)}</span><span class="pl-chip" aria-hidden="true"></span></div>
+      <div class="pl-lb">${f ? (pagado ? "Pagaste en " + mesNom(S.mes) : "Por pagar en " + mesNom(S.mes)) : "Compras anotadas · se pagan en " + mesNom(S.mes)}</div>
+      <div class="pl-big">${money(f || t.det)}</div>
+      <div class="pl-row"><span>${venc ? (pagado || (dd != null && dd < 0) ? "Venció el " : "Vence el ") + dShort(venc) : esc(cap(perTxt))}</span>${pagado ? `<span class="pl-tag ok">Pagado</span>` : venc && f ? `<span>${dd < 0 ? "hace " + -dd + " días" : rel(venc)}</span>` : f ? `<span class="pl-tag">Pendiente</span>` : ""}</div>
+      ${t.cupoTotal ? `<div class="pl-cupo" role="img" aria-label="Cupo usado ${pct(cu, 0)}"><i style="width:${cu * 100}%"></i></div><div class="pl-row" style="margin-top:6px"><span class="pl-sub">Cupo usado ${money(t.cupoUsado || 0)} de ${money(t.cupoTotal)}</span><span>${pct(cu, 0)}</span></div>` : ""}
+      ${t.minimo ? `<div class="pl-row" style="margin-top:4px"><span class="pl-sub">Pago mínimo ${money(t.minimo)}</span></div>` : ""}</section>
+      <div class="acts">${t.id && f ? `<button class="btn ${pagado ? "sec" : "pri"}" data-act="pay" data-kind="tc" data-id="${esc(t.id)}">${pagado ? "Marcar pendiente" : "Marcar pagada"}</button>` : `<button class="btn pri" data-act="tg" data-k="${kEd}">Anotar el total</button>`}
+        <button class="btn sec" data-act="tg" data-k="${kEd}" aria-expanded="${!!S.open[kEd]}">${S.open[kEd] ? "Cerrar" : "Editar"}</button></div>`;
+    const stmt = !(S.open[kEd] || !f) ? "" : `<section class="card"><div class="ch"><h2>Estado de cuenta de ${mesNom(S.mes)}</h2></div><p class="sub">${esc(cap(perTxt))}</p>
       <div class="form">
         <div class="field"><label class="lb" for="tc-${id}">Total facturado</label><div class="money"><span>$</span><input id="tc-${id}" inputmode="numeric" autocomplete="off" value="${fmtIn(f)}" placeholder="0" data-money></div></div>
         <div class="two"><div class="field"><label class="lb" for="tcv-${id}">Vence (opcional)</label><input class="txt" type="date" id="tcv-${id}" value="${esc(t.vence || venceTc(S.mes, card))}"></div>
           <div class="field"><span class="lb">Estado</span><div class="seg" role="group" aria-label="Estado del pago">${["Pendiente", "Pagado"].map(e => `<button data-act="tc-estado" data-card="${esc(card)}" data-v="${e}" aria-pressed="${est === e}">${e}</button>`).join("")}</div></div></div>
         <button class="btn pri wide" data-act="tc-save" data-card="${esc(card)}">Guardar estado de cuenta</button>
-      </div>
-      ${f ? `<div class="stk" role="img" aria-label="Detallado ${pct(pd, 0)} del facturado">${cc.map(([n, v], i) => `<i style="width:${Math.min(100, v / f * 100)}%;background:var(--k${i % 6 + 1})"></i>`).join("")}${t.sin > 0 ? `<i class="hatch" style="width:${t.sin / f * 100}%"></i>` : ""}</div>
-      <ul class="kl">${cc.map(([n, v], i) => `<li><i class="k" style="background:var(--k${i % 6 + 1})"></i><span>${esc(n)}</span><b>${money(v)}</b><em>${pct(v / f, 0)}</em></li>`).join("")}${t.sin > 0 ? `<li><i class="k hatch"></i><span>Sin detallar</span><b>${money(t.sin)}</b><em>${pct(t.sin / f, 0)}</em></li>` : ""}</ul>` : ""}
-      <ol class="steps">
-        <li class="${f ? "ok" : "todo"}"><span>${f ? ic("check") : "1"}</span><div><b>Anota el total facturado</b><small>${f ? money(f) + ", tal como dice el estado de cuenta." : "Lo encuentras en el estado de cuenta de la tarjeta."}</small></div></li>
-        <li class="${t.det ? "ok" : "todo"}"><span>${t.det ? ic("check") : "2"}</span><div><b>Registra tus compras</b><small>${t.n} ${t.n === 1 ? "compra" : "compras"} por ${money(t.det)}${f ? " (" + pct(pd, 0) + " del total)" : ""}.</small></div></li>
-        <li class="${f && t.sin === 0 ? "ok" : "todo"}"><span>${f && t.sin === 0 ? ic("check") : "3"}</span><div><b>${t.sin > 0 ? "Faltan " + money(t.sin) + " por detallar" : t.sin < 0 ? "Registraste " + money(-t.sin) + " de más" : f ? "Todo detallado" : "Revisa lo que falta"}</b><small>${t.sin > 0 ? "Mientras tanto cuentan como gasto variable, para que tu total cuadre con lo que pagas." : t.sin < 0 ? (Number(t.saldoAnterior) < 0 && Math.abs(t.sin) <= Math.abs(t.saldoAnterior) + 1 ? "Es el saldo a favor del período anterior (" + money(-t.saldoAnterior) + ") que el banco descontó del total: está bien." : "Revisa el mes de pago de algunas compras: quizás corresponden al próximo estado de cuenta.") : f ? "Tu gasto por categoría es exacto." : "Cuando anotes el total verás cuánto falta por detallar."}</small></div></li>
-      </ol></section>`;
+      </div><p class="note">Lo encuentras en el estado de cuenta como "monto total facturado". Si subes el PDF, la app lo llena sola.</p></section>`;
+    const det = !f ? "" : `<section class="card"><div class="ch"><h2>¿Cuánto está detallado?</h2><span class="tag ${t.sin > 0 ? "warn" : "good"}">${pct(Math.min(1, pd), 0)}</span></div>
+      <div class="stk" role="img" aria-label="Detallado ${pct(pd, 0)} del facturado">${cc.map(([n, v], i) => `<i style="width:${Math.min(100, v / f * 100)}%;background:var(--k${i % 6 + 1})"></i>`).join("")}${t.sin > 0 ? `<i class="hatch" style="width:${t.sin / f * 100}%"></i>` : ""}</div>
+      <ul class="kl">${cc.map(([n, v], i) => `<li><i class="k" style="background:var(--k${i % 6 + 1})"></i><span>${esc(n)}</span><b>${money(v)}</b><em>${pct(v / f, 0)}</em></li>`).join("")}${t.sin > 0 ? `<li><i class="k hatch"></i><span>Sin detallar</span><b>${money(t.sin)}</b><em>${pct(t.sin / f, 0)}</em></li>` : ""}</ul>
+      <p class="note">${t.sin > 0 ? `Faltan ${money(t.sin)} por detallar: mientras tanto cuentan como gasto variable, para que tu total cuadre con lo que pagas.` : t.sin < 0 ? (Number(t.saldoAnterior) < 0 && Math.abs(t.sin) <= Math.abs(t.saldoAnterior) + 1 ? "Registraste " + money(-t.sin) + " de más: es el saldo a favor del período anterior que el banco descontó del total. Está bien." : "Registraste " + money(-t.sin) + " de más: revisa el mes de pago de algunas compras, quizás son del próximo estado de cuenta.") : "Todo detallado: tu gasto por categoría es exacto."}</p></section>`;
     const imp = `<section class="card"><div class="ch"><h2>${ic("paste")}Detallar desde el banco</h2></div>
-      <p class="p">Sube el PDF del estado de cuenta o de la cartola. La app reconoce si es de Scotiabank o del Banco de Chile, lee cada movimiento, sugiere la categoría, evita duplicados y comprueba que cuadre con el total.</p>
-      <div class="form" style="margin-top:12px"><button class="btn pri wide" data-act="pdf-open">${ic("paste")}Subir PDF del banco</button>
-      <button class="btn sec wide" data-act="imp-open" data-card="${esc(card)}">Pegar texto copiado</button></div>
-      <p class="note">El PDF se lee dentro de tu iPhone y no se sube a ningún lado. Si tiene clave, la app te la pide.</p></section>`;
+      <p class="p">Sube el PDF del estado de cuenta o de la cartola: la app reconoce el banco, sugiere categorías, evita duplicados y revisa que cuadre.</p>
+      <div class="acts" style="margin-top:12px"><button class="btn pri" data-act="pdf-open">Subir PDF</button><button class="btn sec" data-act="imp-open" data-card="${esc(card)}">Pegar texto</button></div>
+      <p class="note">El PDF se lee dentro de tu iPhone. Si tiene clave, la app te la pide.</p></section>`;
     const curso = `<section class="card"><div class="ch"><h2>Compras en curso</h2><span class="tag warn">se pagan en ${mesNom(c.pago)}</span></div>
       ${c.per.corte ? `<p class="sub">Ciclo del ${dShort(c.per.ini)} al ${dShort(c.per.fin)}</p>` : ""}
-      ${c.n ? `<ul class="cats">${c.compras.slice().reverse().map(x => `<li><div class="crow"><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span><div class="cm"><div class="ct"><b>${esc(x.concepto || x.categoria)}</b><span>${money(x.monto)}</span></div><small>${dLong(x.fecha)} · ${esc(x.categoria)}${cuotaTxt(x) ? " · " + cuotaTxt(x) : ""}</small></div></div></li>`).join("")}</ul>
+      ${c.n ? `<ul class="rows">${c.compras.slice().reverse().slice(0, S.open["curso"] ? 999 : 5).map(x => `<li><span class="cic" style="--c:${catColor(x.categoria)}">${ic(CAT_ICON[x.categoria] || "card")}</span><div><b>${esc(nombreLimpio(x.concepto, x.categoria) || x.categoria)}${Number(x.cuotas) > 1 && x.cuota ? `<span class="qtag">${x.cuota}/${x.cuotas}</span>` : ""}</b><small>${dShort(x.fecha)} · ${esc(short(x.categoria))}</small></div><div class="r"><b>${money(x.monto)}</b></div></li>`).join("")}</ul>
+      ${c.n > 5 ? `<button class="more-l" data-act="tg" data-k="curso">${S.open.curso ? "Ver menos" : "Ver las " + c.n}</button>` : ""}
       <p class="note">Total ${money(c.gastado)} en ${c.n} ${c.n === 1 ? "compra" : "compras"}.${c.restantes > 0 && c.presVar ? ` Puedes gastar ${money(c.diaria)} al día sin pasarte.` : ""}</p>`
-      : `<p class="p">Aún no registras compras con tarjeta en ${mesNom(S.mes)}. Una compra hecha hoy aparece en el estado de cuenta del mes siguiente: la app la asigna sola a ${mesNom(c.pago)}.</p>`}</section>`;
-    return stmt + imp + curso;
+      : `<p class="p">Aún no anotas compras con tarjeta para ${mesNom(c.pago)}. Una compra de hoy aparece en el estado de cuenta del mes siguiente: la app la asigna sola.</p>`}</section>`;
+    return plastic + stmt + det + curso + imp;
   }).join("") + cuentaCard("scotia") + cuentaCard("bchile") + `</div>`;
 }
 /* Cuenta corriente de cada banco (Scotiabank, Banco de Chile): línea de crédito, costos y saldo, desde la última cartola guardada. */
@@ -1151,14 +1349,16 @@ function cuentaCard(key) {
   const c = cs.find(x => x.hasta.slice(0, 7) <= S.mes) || cs[cs.length - 1];
   const movsMes = S.movs.filter(x => x.mesPago === S.mes && x.medio === B.medio);
   const gMes = movsMes.filter(x => tipoDe(x) === "Gasto").reduce((a, x) => a + mi(x), 0);
-  const head = `<div class="ch"><h2>${ic("bank")}${esc(B.nombre)} · cuenta corriente</h2></div>`;
+  const head = `<div class="ch"><h2>${ic("bank")}${esc(B.nombre)}</h2><span class="cap">cuenta corriente</span></div>`;
   if (!c) return `<section class="card">${head}<p class="p">Sube la cartola de tu cuenta corriente (PDF) y la app separa los cargos, los costos del banco, los pagos de tu tarjeta y el uso de la línea de crédito.</p>
     <button class="btn sec wide" data-act="pdf-open" style="margin-top:12px">Subir cartola de ${esc(B.nombre)}</button></section>`;
   const uso = c.aprobado ? (c.utilizado || 0) / c.aprobado : 0;
   return `<section class="card">${head}
-    <p class="sub">Última cartola: del ${dShort(c.desde)} al ${dShort(c.hasta)}</p>
-    ${c.aprobado ? `<div class="field"><span class="lb">Línea de crédito</span><div class="cb" role="img" aria-label="Usas ${pct(uso, 0)} de la línea"><i style="width:${Math.min(100, uso * 100)}%;background:var(${uso >= 0.9 ? "--bad" : "--var"})"></i></div>
-      <small class="note" style="margin:0">Usas ${money(c.utilizado || 0)} de ${money(c.aprobado)} (${pct(uso, 0)}) · disponible ${money(c.disponible || 0)}</small></div>` : ""}
+    ${c.aprobado ? `<div class="sumc"><div><span class="cap">Línea de crédito usada</span><div class="sumv">${money(c.utilizado || 0)}</div></div><div class="sumd ${uso >= 0.9 ? "bad" : ""}">${pct(uso, 0)}</div></div>
+      <div class="cb" role="img" aria-label="Usas ${pct(uso, 0)} de la línea" style="margin:10px 0 6px"><i style="width:${Math.min(100, uso * 100)}%;background:var(${uso >= 0.9 ? "--bad" : "--gold"})"></i></div>
+      <small class="note" style="margin:0">de ${money(c.aprobado)} · disponible ${money(c.disponible || 0)}</small>`
+    : c.saldoFinal != null ? `<span class="cap">Saldo al ${dShort(c.hasta)}</span><div class="sumv">${money(c.saldoFinal)}</div>` : ""}
+    <p class="sub" style="margin-top:12px">Última cartola: del ${dShort(c.desde)} al ${dShort(c.hasta)}</p>
     <dl class="kv" style="margin-top:12px"><dt>Cargos del período</dt><dd>${money(c.cargos || 0)}</dd><dt>Abonos del período</dt><dd>${money(c.abonos || 0)}</dd>${c.saldoFinal != null ? `<dt>Saldo final</dt><dd>${money(c.saldoFinal)}</dd>` : ""}${c.intereses ? `<dt>Costos del banco</dt><dd class="bad">${money(c.intereses)}</dd>` : ""}${c.pagosTc ? `<dt>Pagos a tu tarjeta</dt><dd>${money(c.pagosTc)}</dd>` : ""}
       <dt>Gastos con esta cuenta en ${mesNom(S.mes)}</dt><dd>${money(gMes)}</dd></dl>
     ${c.intereses && uso >= 0.9 ? `<p class="msg warn">${ic("alert")}<span>La línea está al tope: pagas cerca de <b>${money(c.intereses)}</b> al mes solo en intereses e impuestos. Bajarla es un ahorro seguro: cada $100.000 que abonas reduce ese costo.</span></p>`
@@ -1940,20 +2140,22 @@ function viewAprende() {
     ["sl", "Saldo libre", "Ingresos menos gastos menos lo que ya apartaste como ahorro. Es lo que de verdad te queda para usar.", `${money(r.ing)} − ${money(r.gas)} − ${money(r.aho)} = <b>${money(r.saldo)}</b>.`],
     ["sd", "Tarjeta sin detallar", "La parte del estado de cuenta que todavía no registraste por categoría. Cuenta como gasto para que el total cuadre con lo que pagas.", r.fact ? `Facturado ${money(r.fact)} − registrado ${money(r.det)} = <b>${money(r.sin)}</b> sin detallar.` : "Este mes no hay estado de cuenta ingresado."],
     ["ap", "Ahorro potencial y real", "Potencial es lo que podrías ahorrar (ingresos − gastos). Real es lo que de verdad apartaste. Solo el real cuenta para tu meta.", `Potencial ${money(r.pot)} · real ${money(r.aho)} · meta ${money(r.meta)}.`],
-    ["gd", "Gasto diario disponible", "Lo que puedes gastar con tarjeta cada día que queda del mes sin pasarte de tu presupuesto variable. Si hay categorías sin presupuesto, la app usa como referencia tu último estado de cuenta.", c.restantes > 0 && c.base ? `(${money(c.base)} − ${money(c.gastado)}) ÷ ${c.restantes} días = <b>${money(c.diaria)}</b> al día${c.fuente === "estado" ? " (referencia: último estado de cuenta)" : ""}.` : c.dia === 0 ? "Este mes aún no empieza." : !c.base ? "Define tu presupuesto variable en Ajustes para calcularlo." : "Este mes ya cerró."],
+    ["gd", "Gasto diario disponible", "Lo que puedes gastar con tarjeta cada día que queda del mes sin pasarte de tu presupuesto variable. Si hay categorías sin presupuesto, la app usa como referencia tu último estado de cuenta.", c.restantes > 0 && c.base ? `(${money(c.base)} − ${money(c.gastado)}) ÷ ${c.restantes} días = <b>${money(c.diaria)}</b> al día${c.fuente === "estado" ? " (referencia: último estado de cuenta)" : ""}.` : c.dia === 0 ? "Este mes aún no empieza." : !c.base ? "Define tu presupuesto variable en Metas para calcularlo." : "Este mes ya cerró."],
     ["pr", "Presupuesto", "El monto que decides de antemano para cada categoría. La app te avisa cuando te acercas al límite.", `Supermercado ${money(pres("Supermercado", S.mes))} · Bencina ${money(pres("Bencina y transporte", S.mes))} · Carnes ${money(pres("Carnes", S.mes))}.`],
     ["ps", "Puntaje de salud", "Un número de 0 a 100 que resume cuatro hábitos: apartar el ahorro (30), respetar el presupuesto (25), detallar la tarjeta (20) y mantener el ritmo de gasto (25).", `Este mes: <b>${salud(S.mes).score}</b> de 100.`],
     ["50", "Regla 50/30/20", "Una guía: 50% del ingreso para necesidades, 30% para gustos y 20% para ahorro.", rg ? `${pct(rg.nec, 0)} necesidades · ${pct(rg.gus, 0)} gustos · ${pct(rg.res, 0)} queda.` : ""],
     ["dv", "Gastos compartidos (÷2)", "Si divides una cuenta, la app suma solo tu parte a tus gastos, pero usa el total para cuadrar la tarjeta.", "Luz y agua van divididas entre 2."],
     ["dc", "Día de facturación", "El día en que el banco cierra tu estado de cuenta. Lo que compras después de ese día entra en el estado siguiente y lo pagas un mes más tarde.", corteDe(CARDS[0]) ? `Tu tarjeta factura el día ${corteDe(CARDS[0])}: lo comprado del ${dShort(c.per.ini)} al ${dShort(c.per.fin)} se paga en ${mesNom(c.pago)}.` : "Aún no lo defines: la app asume que lo de un mes se paga el siguiente. Configúralo en Ajustes → Tarjeta de crédito."],
-    ["mo", "Metas con objetivo", "Una meta con nombre, monto y fecha. La app divide lo que falta por los meses que quedan y te dice cuánto apartar cada mes.", objetivos().length ? objetivos().map(o => esc(o.nombre) + " (" + money(o.monto) + ", " + mesLargo(o.fecha) + ")").join(" · ") : "Aún no tienes metas: créalas en Ajustes."]
+    ["mo", "Metas con objetivo", "Una meta con nombre, monto y fecha. La app divide lo que falta por los meses que quedan y te dice cuánto apartar cada mes.", objetivos().length ? objetivos().map(o => esc(o.nombre) + " (" + money(o.monto) + ", " + mesLargo(o.fecha) + ")").join(" · ") : "Aún no tienes metas: créalas en la pestaña Metas."]
   ];
   return topBar("Glosario con tus números", "Aprende") + `<div class="wrap"><ul class="gl">${T.map(([k, t, d, tu]) => `<li><button data-act="tg" data-k="gl-${k}" aria-expanded="${!!S.open["gl-" + k]}"><b>${t}</b>${ic("chevD", "rot")}</button>${S.open["gl-" + k] ? `<div class="gd"><p>${d}</p>${tu ? `<div class="tu"><b>En ${mesNom(S.mes)}:</b> ${tu}</div>` : ""}</div>` : ""}</li>`).join("")}</ul></div>`;
 }
 
 /* ===================== ajustes ===================== */
-function viewAjustes() {
-  const c = cfg();
+/* ===================== metas: ahorro del mes, objetivos y presupuesto ===================== */
+function viewMetas() {
+  if (S.firstRun) return onboardingView();
+  const c = cfg(), r = resumen(S.mes);
   const groups = ["Fijo", "Variable", "Deuda"];
   const totP = CATS.filter(x => x.t === "Gasto" && x.n !== SINDET).reduce((a, x) => a + pres(x.n, S.mes), 0);
   const ingP = CATS.filter(x => x.t === "Ingreso").reduce((a, x) => a + pres(x.n, S.mes), 0);
@@ -1962,7 +2164,37 @@ function viewAjustes() {
   const bud = x => { const sg = SG[x.n], cur = pres(x.n, S.mes);
     return `<div class="bud-row"><label for="b-${slug(x.n)}">${esc(x.n)}</label><div class="money"><span>$</span><input id="b-${slug(x.n)}" data-cat="${esc(x.n)}" class="bud-in" inputmode="numeric" data-money value="${fmtIn(cur)}" placeholder="0"></div>
       ${sg && sg.v !== cur ? `<button class="sug" data-act="sug" data-cat="${esc(x.n)}" data-v="${sg.v}">Sugerido ${money(sg.v)} · ${esc(sg.base)}</button>` : ""}</div>`; };
-  const tcC = tcCfg(CARDS[0]), objs = objetivos();
+  const objs = objetivos(), falta = Math.max(0, r.meta - r.aho), p = r.meta ? Math.min(1, r.aho / r.meta) : 0;
+  return topBar(mesTit(), "Metas", false, true) + `<div class="wrap">
+  <section class="card hero"><span class="cap">Ahorro de ${mesNom(S.mes)}</span><div class="hero-v">${money(r.aho)}</div>
+    <p class="hero-s">${falta > 0 ? `de tu meta de ${money(r.meta)} · te faltan <b>${money(falta)}</b>` : `Meta de ${money(r.meta)} cumplida.`}</p>
+    <div class="cb" style="margin-top:12px" role="img" aria-label="${pct(p, 0)} de la meta"><i style="width:${p * 100}%;background:var(--gold)"></i></div>
+    ${falta > 0 ? `<button class="btn pri wide" data-act="aho-add">${ic("trend")}Apartar ${money(falta)}</button>` : ""}</section>
+  ${metasCard()}
+  ${catsCard(r)}
+  <section class="card"><div class="ch"><h2>${ic("target")}Metas con objetivo</h2></div>
+    <p class="note" style="margin:0 0 12px">Ponle nombre, monto y fecha a lo que quieres lograr (un viaje, un fondo de emergencia). Al registrar un ahorro eliges a qué meta va, y aquí ves cuánto apartar al mes.</p>
+    ${objs.length ? `<ul class="goals">${objs.map(o => `<li class="gl-row"><div class="pm"><b>${esc(o.nombre)}</b><small>${money(o.monto)} · hasta ${esc(mesLargo(o.fecha))}</small></div><button class="btn ghost sm" data-act="obj-del" data-id="${esc(o.id)}" aria-label="Quitar meta ${esc(o.nombre)}">Quitar</button></li>`).join("")}</ul>` : ""}
+    <div class="form" style="margin-top:12px">
+      <div class="field"><label class="lb" for="obj-nom">Nombre de la meta</label><input class="txt" id="obj-nom" autocomplete="off" placeholder="Ej.: vacaciones de verano"></div>
+      <div class="two"><div class="field"><label class="lb" for="obj-monto">Monto</label><div class="money"><span>$</span><input id="obj-monto" inputmode="numeric" data-money placeholder="0"></div></div>
+        <div class="field"><label class="lb" for="obj-fecha">Para cuándo</label><input class="txt" type="month" id="obj-fecha" value="${addM(keyOf(new Date()), 6)}"></div></div>
+      <button class="btn sec wide" data-act="obj-add">Agregar meta</button></div></section>
+  <button class="sec-h" data-act="tg" data-k="presu" aria-expanded="${!!S.open.presu}"><span>Presupuesto y meta mensual<br><small>${money(totP)} en gastos · meta de ahorro ${money(Number(c.metaAhorro) || 0)}</small></span>${ic("chevD", "rot")}</button>
+  ${S.open.presu ? `<section class="card"><div class="ch"><h2>Meta de ahorro mensual</h2></div>
+    <div class="form">
+      <div class="field"><label class="lb" for="cfg-meta">Meta mensual por defecto</label><div class="money"><span>$</span><input id="cfg-meta" inputmode="numeric" data-money value="${fmtIn(Number(c.metaAhorro) || 0)}"></div></div>
+      <div class="field"><label class="lb" for="cfg-meta-mes">Meta solo para ${esc(mesLargo(S.mes))} (opcional)</label><div class="money"><span>$</span><input id="cfg-meta-mes" inputmode="numeric" data-money value="${metaMes === "" ? "" : fmtIn(Number(metaMes))}" placeholder="usa la meta por defecto"></div></div>
+    </div><p class="note">Se guarda junto con el presupuesto, más abajo.</p></section>
+  <section class="card"><div class="ch"><h2>Presupuesto mensual</h2><span class="sum">${money(totP)}</span></div>
+    <p class="note" style="margin:0 0 12px">Lo que decides gastar en cada categoría. Con esto la app calcula cuánto te queda y cuánto puedes gastar al día.</p>
+    ${nSug ? `<button class="btn sec wide sm" data-act="sug-all" style="margin-bottom:12px">Completar los vacíos con lo sugerido</button><p class="note" style="margin:-4px 0 12px">Sugerido = promedio de lo que gastaste en esa categoría los últimos meses, redondeado a $5.000. Revisa y toca Guardar.</p>` : ""}
+    <div class="bud">${groups.map(gr => `<div class="grp">${gr}</div>` + CATS.filter(x => x.c === gr && x.n !== SINDET).map(bud).join("")).join("")}
+      <div class="grp">Ingresos esperados</div>${CATS.filter(x => x.t === "Ingreso").map(bud).join("")}</div>
+    <p class="note" style="margin:12px 0">Ingresos ${money(ingP)} − gastos ${money(totP)} − meta ${money(Number(c.metaAhorro) || 0)} = <b class="num">${money(ingP - totP - (Number(c.metaAhorro) || 0))}</b> sin asignar.</p>
+    <button class="btn pri wide" data-act="cfg-save">Guardar meta y presupuesto</button></section>` : ""}</div>`;
+}
+function viewAjustes() {
   const tema = temaActual(), iaK = iaClave();
   return topBar("Mis Finanzas", "Ajustes") + `<div class="wrap">
   <section class="card"><div class="ch"><h2>Apariencia</h2></div>
@@ -1976,26 +2208,9 @@ function viewAjustes() {
       <div class="field"><label class="lb" for="ia-key">Clave de la API</label><input class="txt" type="password" id="ia-key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…"></div>
       <button class="btn pri wide" data-act="ia-save">Guardar clave</button></div>`}
     <p class="note">${IA_PRIV}</p></section>
-  <section class="card"><div class="ch"><h2>Meta de ahorro mensual</h2></div>
-    <div class="form">
-      <div class="field"><label class="lb" for="cfg-meta">Meta mensual por defecto</label><div class="money"><span>$</span><input id="cfg-meta" inputmode="numeric" data-money value="${fmtIn(Number(c.metaAhorro) || 0)}"></div></div>
-      <div class="field"><label class="lb" for="cfg-meta-mes">Meta solo para ${esc(mesLargo(S.mes))} (opcional)</label><div class="money"><span>$</span><input id="cfg-meta-mes" inputmode="numeric" data-money value="${metaMes === "" ? "" : fmtIn(Number(metaMes))}" placeholder="usa la meta por defecto"></div></div>
-    </div><p class="note">Se guarda junto con el presupuesto, más abajo.</p></section>
-  <section class="card"><div class="ch"><h2>${ic("target")}Metas con objetivo</h2></div>
-    <p class="note" style="margin:0 0 12px">Ponle nombre, monto y fecha a lo que quieres lograr (un viaje, un fondo de emergencia). Al registrar un ahorro eliges a qué meta va, y en Inicio ves cuánto apartar al mes.</p>
-    ${objs.length ? `<ul class="goals">${objs.map(o => `<li class="gl-row"><div class="pm"><b>${esc(o.nombre)}</b><small>${money(o.monto)} · hasta ${esc(mesLargo(o.fecha))}</small></div><button class="btn ghost sm" data-act="obj-del" data-id="${esc(o.id)}" aria-label="Quitar meta ${esc(o.nombre)}">Quitar</button></li>`).join("")}</ul>` : ""}
-    <div class="form" style="margin-top:12px">
-      <div class="field"><label class="lb" for="obj-nom">Nombre de la meta</label><input class="txt" id="obj-nom" autocomplete="off" placeholder="Ej.: vacaciones de verano"></div>
-      <div class="two"><div class="field"><label class="lb" for="obj-monto">Monto</label><div class="money"><span>$</span><input id="obj-monto" inputmode="numeric" data-money placeholder="0"></div></div>
-        <div class="field"><label class="lb" for="obj-fecha">Para cuándo</label><input class="txt" type="month" id="obj-fecha" value="${addM(keyOf(new Date()), 6)}"></div></div>
-      <button class="btn sec wide" data-act="obj-add">Agregar meta</button></div></section>
-  <section class="card"><div class="ch"><h2>Presupuesto mensual</h2><span class="sum">${money(totP)}</span></div>
-    <p class="note" style="margin:0 0 12px">Lo que decides gastar en cada categoría. Con esto la app calcula cuánto te queda y cuánto puedes gastar al día.</p>
-    ${nSug ? `<button class="btn sec wide sm" data-act="sug-all" style="margin-bottom:12px">Completar los vacíos con lo sugerido</button><p class="note" style="margin:-4px 0 12px">Sugerido = promedio de lo que gastaste en esa categoría los últimos meses, redondeado a $5.000. Revisa y toca Guardar.</p>` : ""}
-    <div class="bud">${groups.map(gr => `<div class="grp">${gr}</div>` + CATS.filter(x => x.c === gr && x.n !== SINDET).map(bud).join("")).join("")}
-      <div class="grp">Ingresos esperados</div>${CATS.filter(x => x.t === "Ingreso").map(bud).join("")}</div>
-    <p class="note" style="margin:12px 0">Ingresos ${money(ingP)} − gastos ${money(totP)} − meta ${money(Number(c.metaAhorro) || 0)} = <b class="num">${money(ingP - totP - (Number(c.metaAhorro) || 0))}</b> sin asignar.</p>
-    <button class="btn pri wide" data-act="cfg-save">Guardar meta y presupuesto</button></section>
+  <section class="card"><div class="ch"><h2>${ic("bulb")}Aprende</h2></div>
+    <p class="note" style="margin:0 0 12px">Glosario con tus números: mes de pago, saldo libre, tarjeta sin detallar, regla 50/30/20 y más.</p>
+    <button class="btn sec wide" data-act="tab" data-tab="aprende">Abrir el glosario</button></section>
   <section class="card"><div class="ch"><h2>Tarjeta de crédito</h2>${infoBtn("corte")}</div>
     <div class="form">
       <div class="two"><div class="field"><label class="lb" for="tc-corte">Día de facturación</label><input class="txt" id="tc-corte" inputmode="numeric" autocomplete="off" value="${corteDe(CARDS[0]) || ""}" placeholder="fin de mes"></div>
@@ -2018,7 +2233,7 @@ function viewAjustes() {
       <button class="btn sec wide" data-act="bk-restore">Restaurar desde un respaldo</button>
       <p class="note" style="margin:0">Tus datos viven solo en este iPhone, dentro de la app. Guarda un respaldo una vez al mes (por ejemplo en Archivos o iCloud Drive). Si borras el ícono de la app, el iPhone borra sus datos.</p>
     </div></section>
-  <p class="foot">Mis Finanzas v2.4 · funciona sin internet · tus datos viven solo en tu iPhone</p></div>`;
+  <p class="foot">Mis Finanzas v3 · Banca privada · funciona sin internet · tus datos viven solo en tu iPhone</p></div>`;
 }
 
 /* ===================== hoja de registro ===================== */
@@ -2061,6 +2276,8 @@ function cuotaTot(f) {
   const N = Number(f.cuotas) || 1, tot = f.vcManual ? valorCuota(f) * N : Number(f.monto) || 0, extra = tot - (Number(f.monto) || 0);
   return `<b>${money(tot)}</b><small>${!f.monto ? "" : extra > N ? "incluye " + money(extra) + " de interés" : "sin interés"}</small>`;
 }
+const anchoMonto = v => (Math.max(1, String(v || "").length) + 0.4) + "ch";
+const saveLbl = f => (f.id ? "Guardar cambios" : "Guardar " + f.tipo.toLowerCase()) + (f.monto ? " · " + money(f.monto) : "");
 function renderSheet() {
   const f = S.form; if (!f || f.copy) return;
   if (f.imp) return renderImport();
@@ -2078,11 +2295,11 @@ function renderSheet() {
     <form class="form" id="f" novalidate>
       ${iaBox(f)}
       <div class="seg" role="group" aria-label="Tipo">${["Gasto", "Ingreso", "Ahorro"].map(t => `<button type="button" data-act="f-tipo" data-v="${t}" aria-pressed="${f.tipo === t}">${t}</button>`).join("")}</div>
-      ${!f.id && !f.ia && f.tipo === "Gasto" ? `<div class="two"><button type="button" class="btn sec" data-act="scan-open">${ic("scan")}Escanear boleta</button><button type="button" class="btn sec" data-act="foto-open">${ic("camera")}Foto con IA</button></div>
+      <label class="amount v3"><span>$</span><input id="f-monto" inputmode="numeric" autocomplete="off" placeholder="0" value="${fmtIn(f.monto)}" aria-label="Monto total" style="width:${anchoMonto(fmtIn(f.monto))}"></label>
+      <div class="share-hint" id="share-hint" style="text-align:center">${shareHint(f)}</div>
+      ${!f.id && !f.ia && f.tipo === "Gasto" ? `<div class="quick"><button type="button" data-act="scan-open">${ic("scan")}Escanear <span class="free">GRATIS</span></button><button type="button" data-act="foto-open">${ic("camera")}Con IA</button></div>
       <button type="button" class="lnk" data-act="scan-texto">¿Copiaste el texto de una foto? Pégalo aquí</button>` : ""}
       ${tpls.length ? `<div class="field"><span class="lb" id="lt">Repetir uno reciente</span><div class="chips" role="group" aria-labelledby="lt">${tpls.map(x => `<button type="button" class="chip" data-act="f-tpl" data-id="${esc(x.id)}">${esc(x.concepto || short(x.categoria))} · ${money(x.monto)}</button>`).join("")}</div></div>` : ""}
-      <label class="amount"><span>$</span><input id="f-monto" inputmode="numeric" autocomplete="off" placeholder="0" value="${fmtIn(f.monto)}" aria-label="Monto total"></label>
-      <div class="share-hint" id="share-hint">${shareHint(f)}</div>
       <div class="field"><span class="lb" id="lc">Categoría</span><div class="tiles" role="group" aria-labelledby="lc">${list.map(tile).join("")}${!showAll ? `<button type="button" class="tile more" data-act="f-more">${ic("plus")}<span>Más categorías</span></button>` : ""}</div></div>
       ${f.tipo === "Ahorro" && objs.length ? `<div class="field"><span class="lb" id="lo">¿Para qué meta?</span><div class="chips" role="group" aria-labelledby="lo">${[{ id: "", nombre: "Sin meta" }].concat(objs).map(o => `<button type="button" class="chip" data-act="f-obj" data-v="${esc(o.id)}" aria-pressed="${(f.objetivo || "") === o.id}">${o.id ? ic("target") : ""}${esc(o.nombre)}</button>`).join("")}</div></div>` : ""}
       <div class="field"><label class="lb" for="f-concepto">Concepto (opcional)</label><input class="txt" id="f-concepto" autocomplete="off" placeholder="${f.tipo === "Gasto" ? "Ej.: Lider, Copec, gimnasio" : f.tipo === "Ingreso" ? "Ej.: sueldo de " + mesNom(S.mes) : "Ej.: fondo mutuo"}" value="${esc(f.concepto)}"></div>
@@ -2092,19 +2309,22 @@ function renderSheet() {
           <div class="field"><span class="lb">Total a pagar</span><div class="cq-tot" id="cq-tot">${cuotaTot(f)}</div></div></div>
           <p class="note" style="margin:-6px 0 0">Sin interés, deja el valor que calcula la app. Con interés, escribe el valor de la cuota que sale en el voucher o en el estado de cuenta.</p>` : ""}` : ""}
       ${f.id && Number(f.cuotas) > 1 && f.grupo ? `<div class="exp" style="margin:0">Cuota ${f.cuota} de ${f.cuotas} de una compra${f.montoCompra ? " de " + money(f.montoCompra) : ""}. Lo que cambies aquí aplica solo a esta cuota.</div>` : ""}
-      <div class="two">
+      ${(() => { const det = f.det != null ? f.det : !!f.id;
+        const resumenDet = [f.fecha === hoyIso() ? "Hoy" : dShort(f.fecha), verbo.toLowerCase() + " " + mesNom(f.mesPago), f.tipo === "Gasto" ? (Number(f.dividir) > 1 ? "÷" + f.dividir : "solo yo") : "", f.tipo === "Gasto" && !card ? f.estado.toLowerCase() : "", f.nota ? "con nota" : ""].filter(Boolean).join(" · ");
+        return `<button type="button" class="det-t" data-act="f-det" aria-expanded="${det}"><span><b>Más detalles</b><small>${esc(resumenDet)}</small></span>${ic(det ? "chevD" : "chevR")}</button>
+      ${det ? `<div class="det-b"><div class="two">
         <div class="field"><label class="lb" for="f-fecha">Fecha</label><input class="txt" type="date" id="f-fecha" value="${esc(f.fecha)}"></div>
         <div class="field"><span class="lb">${verbo}</span><div class="paym"><button type="button" data-act="f-mes-prev" aria-label="Mes de pago anterior">${ic("chevL")}</button><span>${esc(cap(mesNom(f.mesPago)))}<small>${f.mesPago.slice(0, 4)}${card ? " · tarjeta" : ""}</small></span><button type="button" data-act="f-mes-next" aria-label="Mes de pago siguiente">${ic("chevR")}</button></div></div>
       </div>
       ${f.tipo === "Gasto" ? `<div class="field"><span class="lb">¿Lo compartes?</span><div class="seg" role="group" aria-label="Dividir entre">${[1, 2, 3, 4].map(n => `<button type="button" data-act="f-div" data-v="${n}" aria-pressed="${Number(f.dividir) === n}">${n === 1 ? "Solo yo" : "÷" + n}</button>`).join("")}</div></div>` : ""}
       ${f.tipo === "Gasto" && !card ? `<div class="two"><div class="field"><span class="lb">Estado</span><div class="seg" role="group" aria-label="Estado">${["Pagado", "Pendiente"].map(e => `<button type="button" data-act="f-estado" data-v="${e}" aria-pressed="${f.estado === e}">${e}</button>`).join("")}</div></div>
         ${f.estado === "Pendiente" ? `<div class="field"><label class="lb" for="f-vence">Vence (opcional)</label><input class="txt" type="date" id="f-vence" value="${esc(f.vence || "")}"></div>` : ""}</div>` : ""}
-      <div class="field"><label class="lb" for="f-nota">Nota (opcional)</label><input class="txt" id="f-nota" autocomplete="off" value="${esc(f.nota)}"></div>
+      <div class="field"><label class="lb" for="f-nota">Nota (opcional)</label><input class="txt" id="f-nota" autocomplete="off" value="${esc(f.nota)}"></div></div>` : ""}`; })()}
       <div id="f-prev">${previewHTML()}</div>
       <div class="sh-actions">
         ${f.del && f.grupo && Number(f.cuotas) > 1 ? `<div class="confirm" style="display:grid;gap:8px"><span>¿Qué quieres eliminar?</span><button type="button" class="btn pri sm" data-act="f-del-all">La compra completa (${f.cuotas} cuotas)</button><button type="button" class="btn sec sm" data-act="f-del-yes">Solo esta cuota</button><button type="button" class="btn sec sm" data-act="f-del-no">No eliminar</button></div>`
         : f.del ? `<div class="confirm"><span>¿Eliminar este movimiento?</span><span class="row2"><button type="button" class="btn sec sm" data-act="f-del-no">No</button><button type="button" class="btn pri sm" data-act="f-del-yes">Eliminar</button></span></div>` : ""}
-        <button type="submit" class="btn pri wide" ${S.saving ? "disabled" : ""}>${S.saving ? "Guardando…" : f.id ? "Guardar cambios" : "Guardar " + f.tipo.toLowerCase()}</button>
+        <button type="submit" class="btn pri wide" id="f-save" ${S.saving ? "disabled" : ""}>${S.saving ? "Guardando…" : saveLbl(f)}</button>
         ${f.id && !f.del ? '<button type="button" class="btn ghost wide" data-act="f-del">Eliminar</button>' : ""}
       </div>
     </form>`;
@@ -2139,7 +2359,7 @@ function previewHTML() {
     if (o.extra > o.cuotas) L.push(`Con intereses pagas <b>${money(o.tot)}</b> en total: ${money(o.extra)} más que el precio.`);
   } else if (o.card) L.push(`Lo pagas en <b>${mesNom(o.mesPago)}</b>, con el estado de cuenta de la tarjeta.${o.mesPago !== S.mes ? ` Tu saldo de ${mesNom(S.mes)} no cambia.` : ""}`);
   else if (o.tipo === "Gasto") L.push(`Sale de tu plata de <b>${mesNom(o.mesPago)}</b>: tu saldo libre queda en <b>${money(o.saldo2)}</b>.`);
-  if (o.tipo === "Gasto") L.push(o.pres ? (o.cat2 <= o.pres ? `${esc(short(o.cat))}: te quedan <b>${money(o.pres - o.cat2)}</b> de ${money(o.pres)} en ${mesNom(o.mesPago)}.` : `${esc(short(o.cat))}: te pasas por <b>${money(o.cat2 - o.pres)}</b> en ${mesNom(o.mesPago)}.`) : `${esc(o.cat)} no tiene presupuesto: defínelo en Ajustes para que la app te avise.`);
+  if (o.tipo === "Gasto") L.push(o.pres ? (o.cat2 <= o.pres ? `${esc(short(o.cat))}: te quedan <b>${money(o.pres - o.cat2)}</b> de ${money(o.pres)} en ${mesNom(o.mesPago)}.` : `${esc(short(o.cat))}: te pasas por <b>${money(o.cat2 - o.pres)}</b> en ${mesNom(o.mesPago)}.`) : `${esc(o.cat)} no tiene presupuesto: defínelo en Metas para que la app te avise.`);
   if (o.card && o.restantes > 0 && o.presVar) L.push(`Tu gasto diario disponible pasa de ${money(o.dia1)} a <b>${money(o.dia2)}</b>.`);
   if (o.tipo === "Ingreso") L.push(`Entra en <b>${mesNom(o.mesPago)}</b>: tu saldo libre queda en <b>${money(o.saldo2)}</b>.`);
   if (o.tipo === "Ahorro") {
@@ -2411,6 +2631,9 @@ document.addEventListener("click", e => {
     case "fab": if (S.db) openSheet(); else toast("Sin conexión con tu base de datos."); break;
     case "falta": { const x = faltantes(S.mes).find(i => i.k === b.dataset.k); if (x && x.base) openSheet(Object.assign({}, x.base)); break; }
     case "falta-todas": anotarTodas(); break;
+    case "falta-costos": anotarTodas(x => esCostoBanco(x.cat, x.nombre)); break;
+    case "priv": togglePriv(); break;
+    case "presu-open": S.tab = "metas"; S.open.presu = true; setHash(); render(); window.scrollTo(0, 0); break;
     case "tema": aplicarTema(v); render(); { const n = document.querySelector(`[data-act="tema"][data-v="${v}"]`); if (n) n.focus({ preventScroll: true }); } toast(v === "auto" ? "Tema automático, como el iPhone" : v === "dark" ? "Modo oscuro activado" : "Modo claro activado"); break;
     case "ics": exportIcs(); break;
     case "obj-aportar": { const o = objetivos().find(x => x.id === b.dataset.id); if (o) openSheet({ tipo: "Ahorro", objetivo: o.id, monto: Number(v) || 0, concepto: o.nombre }); break; }
@@ -2472,6 +2695,7 @@ document.addEventListener("click", e => {
     case "f-del-no": f.del = false; renderSheet(); break;
     case "f-del-yes": deleteForm(); break;
     case "f-del-all": deleteForm(true); break;
+    case "f-det": f.det = !(f.det != null ? f.det : !!f.id); renderSheet(); break;
     case "f-cuotas": f.cuotas = Number(v) || 1; f.vcManual = false; f.valorCuota = 0; renderSheet(); break;
     case "filtro": S.filtro = v; render(); break;
     case "tg": { const k = b.dataset.k; S.open[k] = !S.open[k]; render(); const n = document.querySelector(`[data-act="tg"][data-k="${k}"]`); if (n) n.focus({ preventScroll: true }); break; }
@@ -2480,7 +2704,7 @@ document.addEventListener("click", e => {
       tcDraft[card] = v;
       if (cur && cur.id) saveTc(card, true); else b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
       break; }
-    case "tc-save": saveTc(b.dataset.card); break;
+    case "tc-save": S.open["tcedit-" + slug(b.dataset.card)] = false; saveTc(b.dataset.card); break;
     case "cfg-save": saveCfg(); break;
     case "exp-scope": S.expScope = v; render(); break;
     case "exp-movs": { const rows = exportRows(); if (!rows.length) { toast("No hay movimientos para exportar."); break; } copyText(rows.map(x => movCols(x).join("\t")).join("\n"), rows.length + " movimientos"); break; }
@@ -2504,7 +2728,7 @@ document.addEventListener("input", e => {
   if (t.id === "tc-corte" || t.id === "tc-pago") { t.value = String(digits(t.value) || "").slice(0, 2); return; }
   if (t.id === "f-monto" || t.hasAttribute("data-money")) {
     const n = digits(t.value); t.value = fmtIn(n);
-    if (t.id === "f-monto" && S.form) { S.form.monto = n; updLive(); }
+    if (t.id === "f-monto" && S.form) { S.form.monto = n; t.style.width = anchoMonto(t.value); updLive(); const sb = $("#f-save"); if (sb && !S.saving) sb.textContent = saveLbl(S.form); }
     if (t.id === "f-vcuota" && S.form) { S.form.vcManual = n > 0; S.form.valorCuota = n; updLive(); }
   }
 });
@@ -2515,7 +2739,7 @@ document.addEventListener("change", e => {
   else if (S.form.imp && e.target.matches(".sel[data-i]")) { const r = S.form.rows[Number(e.target.dataset.i)]; if (r) { r.cat = e.target.value; if (r.cat && !r.abono) r.on = true; renderImport(); } }
 });
 document.addEventListener("focusout", e => { if (e.target.id === "q" && S.pendingRender) setTimeout(() => { if (document.activeElement !== e.target) render(); }, 0); });
-const TABS = ["resumen", "movimientos", "tarjeta", "aprende", "ajustes"];
+const TABS = ["resumen", "movimientos", "tarjeta", "metas", "aprende", "ajustes"];
 function setHash() { try { history.replaceState(null, "", "#" + S.tab); } catch (e) { /* algunos visores no permiten cambiar la URL */ } }
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.form) closeSheet();
