@@ -1,4 +1,4 @@
-const CACHE = "mf-app-v13";
+const CACHE = "mf-app-v14";
 const FONTS = "mf-fonts-v1";
 const LIBS = "mf-libs-v1"; /* lector de PDF (pdf.js) y SDK de Claude (lectura de boletas), versiones fijas: se guardan tras el primer uso */
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
@@ -24,7 +24,7 @@ self.addEventListener("fetch", e => {
     e.respondWith(caches.open(FONTS).then(c => c.match(req).then(hit => hit || fetch(req).then(r => { c.put(req, r.clone()); return r; }))));
     return;
   }
-  if ((url.hostname === "cdnjs.cloudflare.com" && url.pathname.includes("/pdf.js/")) || (url.hostname === "cdn.jsdelivr.net" && /^\/npm\/(@[^/]+\/)?[^/@]+@\d+\.\d+\.\d+\//.test(url.pathname))) {
+  if ((url.hostname === "cdnjs.cloudflare.com" && (url.pathname.includes("/pdf.js/") || url.pathname.includes("/xlsx/"))) || (url.hostname === "cdn.jsdelivr.net" && /^\/npm\/(@[^/]+\/)?[^/@]+@\d+\.\d+\.\d+\//.test(url.pathname))) {
     e.respondWith(caches.open(LIBS).then(c => c.match(req).then(hit => hit || fetch(req).then(r => { if (r.ok) c.put(req, r.clone()); return r; }))));
   }
 });
